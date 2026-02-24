@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Agentic Persona Builder</title>
-  <script src="config.js"></script>
+  <!-- config.js is only used when opening as file:// — ignored when served via node server.js -->
+  <script>window.DEEPSEEK_KEY = null;</script>
+  <script src="config.js" onerror="console.info('config.js not served (expected when using node server.js)')"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -93,6 +95,19 @@
   </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
+
+<!-- file:// warning banner — hidden when running via node server.js -->
+<div id="fileBanner" class="hidden bg-amber-50 border-b border-amber-200 px-5 py-2.5 text-xs text-amber-800">
+  <div class="max-w-4xl mx-auto flex items-center gap-3 flex-wrap">
+    <span class="text-base">⚠️</span>
+    <span>Opened as a local file — DeepSeek AI won't work due to browser security (CORS).
+      For full AI functionality, run:
+      <code class="font-mono bg-amber-100 border border-amber-200 px-1.5 py-0.5 rounded mx-1">node server.js</code>
+      then open
+      <a href="http://localhost:3000" class="underline font-mono">http://localhost:3000</a>
+    </span>
+  </div>
+</div>
 
 <!-- ─── HEADER ──────────────────────────────────────────────────────── -->
 <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
@@ -421,17 +436,32 @@ document.getElementById('roleSelect').addEventListener('change', function() {
    DEEPSEEK API
 ═══════════════════════════════════════════════════════════════════════ */
 async function callDeepSeek(messages, maxTokens = 3500) {
-  const key = window.DEEPSEEK_KEY;
-  if (!key || key === 'YOUR_DEEPSEEK_API_KEY_HERE') throw new Error('DeepSeek API key not configured');
+  const isHTTP = window.location.protocol === 'http:' || window.location.protocol === 'https:';
 
-  const res = await fetch(DEEPSEEK_ENDPOINT, {
+  let fetchUrl, fetchHeaders;
+
+  if (isHTTP) {
+    // ✅ Running via node server.js — API key lives on the server, never in the browser
+    fetchUrl     = '/api/deepseek';
+    fetchHeaders = { 'Content-Type': 'application/json' };
+  } else {
+    // ⚠️  Opened as file:// — attempt direct call using config.js key (likely blocked by browser CORS)
+    const key = window.DEEPSEEK_KEY;
+    if (!key || key === 'YOUR_DEEPSEEK_API_KEY_HERE') {
+      throw new Error('Run `node server.js` and open http://localhost:3000 for DeepSeek AI');
+    }
+    fetchUrl     = DEEPSEEK_ENDPOINT;
+    fetchHeaders = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` };
+  }
+
+  const res = await fetch(fetchUrl, {
     method: 'POST',
-    headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${key}` },
-    body: JSON.stringify({ model:DEEPSEEK_MODEL, messages, temperature:0.7, max_tokens:maxTokens })
+    headers: fetchHeaders,
+    body: JSON.stringify({ model: DEEPSEEK_MODEL, messages, temperature: 0.7, max_tokens: maxTokens })
   });
 
   if (!res.ok) {
-    const e = await res.json().catch(()=>({}));
+    const e = await res.json().catch(() => ({}));
     throw new Error(e.error?.message || `HTTP ${res.status}`);
   }
   const data = await res.json();
@@ -1229,6 +1259,11 @@ function toast(msg, type='error') {
    INIT
 ═══════════════════════════════════════════════════════════════════════ */
 initOcean();
+
+/* Show banner if opened as file:// */
+if (window.location.protocol === 'file:') {
+  document.getElementById('fileBanner').classList.remove('hidden');
+}
 </script>
 </body>
 </html>
