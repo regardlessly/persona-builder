@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agentic Persona Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * { font-family: 'Inter', sans-serif; }
+
+    .fade-in { animation: fadeIn 0.35s ease both; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* OCEAN range slider */
+    .ocean-range {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 99px;
+      outline: none;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    .ocean-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #4f46e5;
+      border: 3px solid #fff;
+      box-shadow: 0 1px 6px rgba(0,0,0,.25);
+      cursor: pointer;
+      transition: transform .15s;
+    }
+    .ocean-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+    /* Pill toggle (checkbox / radio styled as pill) */
+    .pill-input { display: none; }
+    .pill-label {
+      display: inline-flex; align-items: center;
+      padding: 6px 14px; border-radius: 99px;
+      border: 1.5px solid #d1d5db;
+      font-size: 13px; font-weight: 500; color: #6b7280;
+      cursor: pointer; user-select: none;
+      transition: border-color .15s, background .15s, color .15s;
+      white-space: nowrap;
+    }
+    .pill-input:checked + .pill-label {
+      border-color: #4f46e5;
+      background: #eef2ff;
+      color: #4338ca;
+    }
+
+    /* Card radio option */
+    .card-radio { display: none; }
+    .card-label {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 12px 14px; border-radius: 12px;
+      border: 1.5px solid #e5e7eb;
+      cursor: pointer; transition: border-color .15s, background .15s;
+    }
+    .card-radio:checked + .card-label {
+      border-color: #4f46e5;
+      background: #f5f3ff;
+    }
+
+    /* Tab button */
+    .tab-btn {
+      padding: 12px 20px; font-size: 13px; font-weight: 500;
+      color: #6b7280; border-bottom: 2px solid transparent;
+      transition: color .15s, border-color .15s;
+      cursor: pointer; white-space: nowrap;
+    }
+    .tab-btn.active { color: #4f46e5; border-bottom-color: #4f46e5; }
+
+    /* Monospace prompt area */
+    .prompt-area {
+      font-family: 'Courier New', monospace;
+      font-size: 12.5px; line-height: 1.75;
+      color: #1e293b;
+    }
+
+    /* Smooth step connector fill */
+    .step-line { height: 2px; flex: 1; background: #e5e7eb; transition: background .4s; }
+    .step-line.done { background: #4f46e5; }
+
+    /* Tooltip */
+    .tooltip { position: relative; }
+    .tooltip .tip {
+      display: none; position: absolute; bottom: 110%; left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b; color: #fff; font-size: 11px;
+      padding: 5px 10px; border-radius: 6px;
+      width: 200px; text-align: center; z-index: 20;
+      white-space: normal; pointer-events: none;
+    }
+    .tooltip:hover .tip { display: block; }
+
+    /* KB card priority badge */
+    .badge-role { background: #ede9fe; color: #5b21b6; }
+    .badge-universal { background: #f1f5f9; color: #64748b; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+<!-- ─── HEADER ─────────────────────────────────────────────────────── -->
+<header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+  <div class="max-w-4xl mx-auto px-5 py-3 flex items-center justify-between gap-4">
+    <!-- Logo -->
+    <div class="flex items-center gap-2.5 shrink-0">
+      <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+        <svg class="w-4.5 h-4.5 text-white w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="font-bold text-gray-900 text-sm leading-none">Persona Builder</div>
+        <div class="text-[10px] text-gray-400 leading-none mt-0.5">Agentic AI Config Tool</div>
+      </div>
+    </div>
+
+    <!-- Progress steps -->
+    <div class="flex items-center gap-1 flex-1 max-w-sm mx-auto">
+      <!-- Step 1 -->
+      <div class="flex items-center gap-1.5">
+        <div id="s1-circle"
+          class="w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center shrink-0 transition-all">1</div>
+        <span id="s1-label" class="text-xs font-medium text-indigo-700 hidden sm:block whitespace-nowrap">Foundation</span>
+      </div>
+      <div class="step-line" id="line-12"></div>
+      <!-- Step 2 -->
+      <div class="flex items-center gap-1.5">
+        <div id="s2-circle"
+          class="w-7 h-7 rounded-full bg-gray-200 text-gray-500 text-xs font-bold flex items-center justify-center shrink-0 transition-all">2</div>
+        <span id="s2-label" class="text-xs text-gray-400 hidden sm:block whitespace-nowrap">Refinement</span>
+      </div>
+      <div class="step-line" id="line-23"></div>
+      <!-- Step 3 -->
+      <div class="flex items-center gap-1.5">
+        <div id="s3-circle"
+          class="w-7 h-7 rounded-full bg-gray-200 text-gray-500 text-xs font-bold flex items-center justify-center shrink-0 transition-all">3</div>
+        <span id="s3-label" class="text-xs text-gray-400 hidden sm:block whitespace-nowrap">Output</span>
+      </div>
+    </div>
+
+    <div class="w-20 shrink-0"></div><!-- spacer -->
+  </div>
+</header>
+
+<!-- ─── MAIN ───────────────────────────────────────────────────────── -->
+<main class="max-w-4xl mx-auto px-5 py-8">
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       ROUND 1 — FOUNDATION
+  ══════════════════════════════════════════════════════════════════ -->
+  <div id="round1" class="fade-in">
+
+    <div class="mb-7">
+      <div class="inline-flex items-center gap-1.5 bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full mb-2">
+        Round 1 of 3
+      </div>
+      <h2 class="text-2xl font-bold text-gray-900">Build Your Persona Foundation</h2>
+      <p class="text-gray-500 text-sm mt-1">Define the core identity, personality, and purpose of your AI persona.</p>
+    </div>
+
+    <!-- ── A. AGENT IDENTITY ───────────────────────────────────────── -->
+    <div class="bg-white rounded-2xl p-6 mb-5 border border-gray-100 shadow-sm">
+      <h3 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        <span class="w-5 h-5 rounded bg-indigo-100 text-indigo-700 text-[10px] font-bold flex items-center justify-center">A</span>
+        Agent Identity
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">
+            Character Name <span class="text-red-400">*</span>
+          </label>
+          <input id="charName" type="text" placeholder="e.g., Zhen, Auntie Rose, Coach Ali"
+            class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">
+            Role <span class="text-red-400">*</span>
+            <span class="tooltip ml-1 inline-block cursor-help text-gray-400">
+              &#9432;
+              <span class="tip">The broad role category (e.g., TCM Advisor, Nutritionist). Maps to the "Role" field in the agent config.</span>
+            </span>
+          </label>
+          <select id="roleSelect"
+            class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white transition">
+            <option value="">Select a role…</option>
+            <option value="tcm">🌿 TCM Advisor</option>
+            <option value="nutritionist">🥗 Nutritionist</option>
+            <option value="fitness">🏃 Fitness & Movement Coach</option>
+            <option value="carpentry">🪚 Carpentry & Woodcraft</option>
+            <option value="music_therapy">🎵 Music Therapist</option>
+            <option value="art_therapy">🎨 Art & Creative Therapist</option>
+            <option value="counsellor">💬 Life Counsellor</option>
+            <option value="tech_helper">💻 Tech Helper</option>
+            <option value="gardening">🌱 Horticultural Therapist</option>
+            <option value="custom">⚙️ Custom Role…</option>
+          </select>
+        </div>
+
+        <div id="customRoleWrap" class="hidden">
+          <label class="block text-xs font-medium text-gray-600 mb-1">Custom Role Name</label>
+          <input id="customRole" type="text" placeholder="e.g., Financial Literacy Guide"
+            class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">
+            Expertise
+            <span class="tooltip ml-1 inline-block cursor-help text-gray-400">
+              &#9432;
+              <span class="tip">The persona's specific expertise style — Advisor, Coach, Companion, Educator, Therapist, etc.</span>
+            </span>
+          </label>
+          <select id="expertiseSelect"
+            class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white transition">
+            <option value="Advisor">Advisor</option>
+            <option value="Coach">Coach</option>
+            <option value="Companion">Companion</option>
+            <option value="Educator">Educator</option>
+            <option value="Therapist">Therapist</option>
+            <option value="Guide">Guide</option>
+            <option value="Consultant">Consultant</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">LLM Model</label>
+          <select id="llmModel"
+            class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white transition">
+            <option>[DEV] - Alibaba Qwen</option>
+            <option>Claude Sonnet 4.6</option>
+            <option>Claude Haiku 4.5</option>
+            <option>GPT-4o</option>
+            <option>GPT-4o Mini</option>
+          </select>
+        </div>
+
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-medium text-gray-600 mb-1">
+            One-line description <span class="text-red-400">*</span>
+          </label>
+          <input id="shortDesc" type="text"
+            placeholder="e.g., Provides guidance and insight on Traditional Chinese Medicine"
+            class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition" />
+        </div>
+
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-medium text-gray-600 mb-1">What makes this persona unique?</label>
+          <textarea id="uniqueness" rows="2"
+            placeholder="e.g., Zhen blends classical TCM wisdom with modern evidence. She speaks with warmth, uses everyday analogies, and always relates ancient principles to daily life."
+            class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition resize-none"></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── B. TARGET AUDIENCE & LANGUAGE ─────────────────────────── -->
+    <div class="bg-white rounded-2xl p-6 mb-5 border border-gray-100 shadow-sm">
+      <h3 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        <span class="w-5 h-5 rounded bg-emerald-100 text-emerald-700 text-[10px] font-bold flex items-center justify-center">B</span>
+        Target Audience & Language
+      </h3>
+
+      <div class="space-y-5">
+
+        <!-- Audience -->
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-2">Primary Audience</label>
+          <div class="flex flex-wrap gap-2">
+            <input class="pill-input" type="radio" name="audience" id="aud-senior" value="Senior" checked />
+            <label class="pill-label" for="aud-senior">🧓 Senior</label>
+
+            <input class="pill-input" type="radio" name="audience" id="aud-adult" value="Adult" />
+            <label class="pill-label" for="aud-adult">👤 Adult</label>
+
+            <input class="pill-input" type="radio" name="audience" id="aud-teen" value="Teen" />
+            <label class="pill-label" for="aud-teen">🧑 Teen</label>
+
+            <input class="pill-input" type="radio" name="audience" id="aud-child" value="Child" />
+            <label class="pill-label" for="aud-child">🧒 Child</label>
+          </div>
+        </div>
+
+        <!-- Senior-specific sub-options (shown when Senior selected) -->
+        <div id="seniorOpts">
+          <label class="block text-xs font-medium text-gray-600 mb-2">Senior — Cognitive Support Level</label>
+          <div class="flex flex-col gap-2">
+            <label class="card-label cursor-pointer">
+              <input class="card-radio" type="radio" name="cogLevel" value="standard" checked />
+              <div>
+                <div class="text-sm font-medium text-gray-800">Standard</div>
+                <div class="text-xs text-gray-500">Full cognition — normal conversation depth</div>
+              </div>
+            </label>
+            <label class="card-label cursor-pointer">
+              <input class="card-radio" type="radio" name="cogLevel" value="mild" />
+              <div>
+                <div class="text-sm font-medium text-gray-800">Gentle Support</div>
+                <div class="text-xs text-gray-500">May have mild memory concerns — extra patience, avoid information overload</div>
+              </div>
+            </label>
+            <label class="card-label cursor-pointer">
+              <input class="card-radio" type="radio" name="cogLevel" value="intensive" />
+              <div>
+                <div class="text-sm font-medium text-gray-800">Intensive Support</div>
+                <div class="text-xs text-gray-500">Significant cognitive needs — keep responses very short and simple</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Languages -->
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-2">Language(s)</label>
+          <div class="flex flex-wrap gap-2">
+            <input class="pill-input" type="checkbox" id="lang-en" name="lang" value="English" checked />
+            <label class="pill-label" for="lang-en">English</label>
+
+            <input class="pill-input" type="checkbox" id="lang-zh" name="lang" value="Mandarin" />
+            <label class="pill-label" for="lang-zh">普通话 Mandarin</label>
+
+            <input class="pill-input" type="checkbox" id="lang-yue" name="lang" value="Cantonese" />
+            <label class="pill-label" for="lang-yue">广东话 Cantonese</label>
+
+            <input class="pill-input" type="checkbox" id="lang-ms" name="lang" value="Malay" />
+            <label class="pill-label" for="lang-ms">Bahasa Melayu</label>
+
+            <input class="pill-input" type="checkbox" id="lang-ta" name="lang" value="Tamil" />
+            <label class="pill-label" for="lang-ta">தமிழ் Tamil</label>
+
+            <input class="pill-input" type="checkbox" id="lang-hk" name="lang" value="Hokkien" />
+            <label class="pill-label" for="lang-hk">福建話 Hokkien</label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── C. TONE ─────────────────────────────────────────────────── -->
+    <div class="bg-white rounded-2xl p-6 mb-5 border border-gray-100 shadow-sm">
+      <h3 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        <span class="w-5 h-5 rounded bg-amber-100 text-amber-700 text-[10px] font-bold flex items-center justify-center">C</span>
+        Tone
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
+        <label class="card-label cursor-pointer">
+          <input class="card-radio" type="radio" name="tone" value="Empathetic" />
+          <div>
+            <div class="text-sm font-medium text-gray-800">🤗 Empathetic</div>
+            <div class="text-xs text-gray-500">Warm, validating, emotionally attuned</div>
+          </div>
+        </label>
+
+        <label class="card-label cursor-pointer">
+          <input class="card-radio" type="radio" name="tone" value="Professional" />
+          <div>
+            <div class="text-sm font-medium text-gray-800">🎓 Professional</div>
+            <div class="text-xs text-gray-500">Knowledgeable, clear, trustworthy</div>
+          </div>
+        </label>
+
+        <label class="card-label cursor-pointer">
+          <input class="card-radio" type="radio" name="tone" value="Friendly" checked />
+          <div>
+            <div class="text-sm font-medium text-gray-800">😊 Friendly</div>
+            <div class="text-xs text-gray-500">Approachable, conversational, relaxed</div>
+          </div>
+        </label>
+
+        <label class="card-label cursor-pointer">
+          <input class="card-radio" type="radio" name="tone" value="Motivational" />
+          <div>
+            <div class="text-sm font-medium text-gray-800">💪 Motivational</div>
+            <div class="text-xs text-gray-500">Uplifting, encouraging, action-oriented</div>
+          </div>
+        </label>
+
+      </div>
+    </div>
+
+    <!-- ── D. OCEAN PERSONALITY ────────────────────────────────────── -->
+    <div class="bg-white rounded-2xl p-6 mb-5 border border-gray-100 shadow-sm">
+      <h3 class="text-sm font-semibold text-gray-800 mb-1 flex items-center gap-2">
+        <span class="w-5 h-5 rounded bg-purple-100 text-purple-700 text-[10px] font-bold flex items-center justify-center">D</span>
+        OCEAN Personality Framework
+      </h3>
+      <p class="text-xs text-gray-400 mb-5 ml-7">Drag each slider to shape how the persona thinks, speaks, and behaves.</p>
+      <div id="oceanSliders" class="space-y-6"></div>
+    </div>
+
+    <!-- ── E. CORE PURPOSE & LIMITS ───────────────────────────────── -->
+    <div class="bg-white rounded-2xl p-6 mb-5 border border-gray-100 shadow-sm">
+      <h3 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        <span class="w-5 h-5 rounded bg-rose-100 text-rose-700 text-[10px] font-bold flex items-center justify-center">E</span>
+        Core Purpose & Limits
+      </h3>
+      <div class="space-y-4">
+
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Primary Goals <span class="text-red-400">*</span></label>
+          <textarea id="primaryGoals" rows="3"
+            placeholder="What should this persona help seniors achieve? e.g., Provide accessible TCM wellness guidance, explain herbal food therapy in everyday language, encourage lifestyle habits aligned with TCM principles…"
+            class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition resize-none"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Hard Limits / What to Avoid</label>
+          <textarea id="hardLimits" rows="2"
+            placeholder="e.g., Never diagnose medical conditions, never recommend stopping prescribed medication, never claim treatments can cure serious diseases…"
+            class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition resize-none"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-2">Emergency Protocol</label>
+          <div class="flex flex-col gap-2">
+
+            <label class="card-label cursor-pointer">
+              <input class="card-radio" type="radio" name="emergency" value="staff" />
+              <span class="text-sm text-gray-700">Direct senior to press call button / speak to staff immediately</span>
+            </label>
+
+            <label class="card-label cursor-pointer">
+              <input class="card-radio" type="radio" name="emergency" value="hotline" />
+              <span class="text-sm text-gray-700">Provide emergency hotline (995 / 1800-202-6868)</span>
+            </label>
+
+            <label class="card-label cursor-pointer">
+              <input class="card-radio" type="radio" name="emergency" value="both" checked />
+              <span class="text-sm text-gray-700">Both — direct to staff AND provide hotline</span>
+            </label>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="flex justify-end mt-2">
+      <button onclick="goToRound2()"
+        class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-semibold px-7 py-3 rounded-xl text-sm transition shadow-md flex items-center gap-2">
+        Continue to Refinement
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+
+  </div><!-- /round1 -->
+
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       ROUND 2 — REFINEMENT (dynamically rendered)
+  ══════════════════════════════════════════════════════════════════ -->
+  <div id="round2" class="hidden"></div>
+
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       ROUND 3 — OUTPUT (dynamically rendered)
+  ══════════════════════════════════════════════════════════════════ -->
+  <div id="round3" class="hidden"></div>
+
+</main>
+
+<!-- Toast container -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none"></div>
+
+<!-- ─── SCRIPT ─────────────────────────────────────────────────────── -->
+<script>
+/* ─────────────────────────────────────────────────────────────────────
+   STATE
+───────────────────────────────────────────────────────────────────── */
+const state = {
+  ocean: { O: 7, C: 6, E: 5, A: 8, N: 3 },
+  r1: {},
+  r2: {}
+};
+
+/* ─────────────────────────────────────────────────────────────────────
+   OCEAN DEFINITIONS
+───────────────────────────────────────────────────────────────────── */
+const oceanDefs = [
+  { key:'O', label:'Openness',            emoji:'🔭', lo:'Conventional',         hi:'Curious & Creative',      loDesc:'Prefers tried-and-true, familiar approaches', hiDesc:'Loves exploring ideas, creative and imaginative' },
+  { key:'C', label:'Conscientiousness',   emoji:'📋', lo:'Flexible & Spontaneous',hi:'Organised & Methodical',  loDesc:'Relaxed, goes with the flow, adaptable',       hiDesc:'Structured, thorough, detail-oriented' },
+  { key:'E', label:'Extraversion',        emoji:'🗣️', lo:'Reserved & Reflective', hi:'Outgoing & Energetic',    loDesc:'Calm, listens deeply, speaks thoughtfully',    hiDesc:'Enthusiastic, talkative, warm and expressive' },
+  { key:'A', label:'Agreeableness',       emoji:'🤝', lo:'Direct & Analytical',   hi:'Cooperative & Empathetic',loDesc:'Objective, honest, straightforward',           hiDesc:'Warm, supportive, deeply people-focused' },
+  { key:'N', label:'Emotional Stability', emoji:'⚖️', lo:'Very Stable',           hi:'Emotionally Responsive',  loDesc:'Calm, consistent, unflappable',                hiDesc:'Sensitive, emotionally attuned, reactive' }
+];
+
+/* ─────────────────────────────────────────────────────────────────────
+   ROLE DEFINITIONS
+───────────────────────────────────────────────────────────────────── */
+const ROLES = {
+  tcm:          { label:'TCM Advisor',              emoji:'🌿' },
+  nutritionist: { label:'Nutritionist',             emoji:'🥗' },
+  fitness:      { label:'Fitness & Movement Coach', emoji:'🏃' },
+  carpentry:    { label:'Carpentry & Woodcraft',     emoji:'🪚' },
+  music_therapy:{ label:'Music Therapist',           emoji:'🎵' },
+  art_therapy:  { label:'Art & Creative Therapist',  emoji:'🎨' },
+  counsellor:   { label:'Life Counsellor',           emoji:'💬' },
+  tech_helper:  { label:'Tech Helper',               emoji:'💻' },
+  gardening:    { label:'Horticultural Therapist',   emoji:'🌱' },
+  custom:       { label:'Custom',                    emoji:'⚙️'  }
+};
+function roleName(k) { return ROLES[k]?.label || 'Persona'; }
+function roleEmoji(k){ return ROLES[k]?.emoji || '🤖'; }
+
+/* ─────────────────────────────────────────────────────────────────────
+   ROUND 2 QUESTIONS PER ROLE
+───────────────────────────────────────────────────────────────────── */
+const roleQuestions = {
+  tcm: [
+    { type:'checkbox', q:'Which TCM modalities should this persona be expert in?',
+      opts:['Herbal medicine & food therapy (食疗)','Acupressure & meridian concepts','Qigong & Tai Chi guidance','Dietary therapy by constitution','Seasonal wellness practices','Five Elements (五行) theory','Cupping & Moxibustion awareness'] },
+    { type:'radio', q:'When recommending herbs, the persona should:',
+      opts:['Provide educational info on herb names and general uses','Only discuss food-grade herbs (goji, red dates, ginger, etc.)','Describe TCM principles only — no specific herb names','Always recommend consulting a licensed TCM physician first'] },
+    { type:'radio', q:'When TCM and Western medicine seem to conflict, the persona should:',
+      opts:['Present both perspectives neutrally and encourage consulting both physicians','Gently favour TCM while acknowledging the value of Western medicine','Strictly defer to prescribed medication and encourage doctor consultation','Explain TCM perspective, but never suggest stopping any medication'] },
+    { type:'checkbox', q:'Key senior health areas for this persona to address:',
+      opts:['Joint pain & arthritis','Sleep difficulties','Digestive health','Blood pressure & circulation','Energy & chronic fatigue','Emotional wellbeing','Memory & cognitive health','Appetite & nutrition','Skin & ageing'] }
+  ],
+  nutritionist: [
+    { type:'checkbox', q:'Which dietary frameworks should this persona understand?',
+      opts:['Diabetic-friendly / low glycaemic','Low sodium (heart & kidney health)','Soft / minced foods (dysphagia)','Vegetarian / vegan','Halal','Buddhist vegetarian','High-protein for muscle retention','Mediterranean diet','Renal diet'] },
+    { type:'radio', q:'Should the persona address medication–food interactions?',
+      opts:['Yes — flag common interactions (e.g., warfarin & leafy greens)','Mention it may be relevant but always defer to pharmacist/doctor','No — focus on general healthy eating only'] },
+    { type:'checkbox', q:'Relevant cooking context for your seniors:',
+      opts:['Seniors cook for themselves','Family members cook for seniors','Facility prepares all meals','Seniors have limited kitchen mobility','Budget-conscious meal planning','Guidance for hawker / outside food'] }
+  ],
+  fitness: [
+    { type:'checkbox', q:'Types of physical activities to include:',
+      opts:['Chair-based exercises','Walking programmes','Balance & fall prevention','Light strength training','Stretching & flexibility','Tai Chi & Qigong','Breathing exercises','Water aerobics','Dance & movement therapy'] },
+    { type:'radio', q:'Safety emphasis level:',
+      opts:['Maximum safety — always suggest medical clearance before any exercise','Balanced — motivational but weave in safety tips','Motivational first — encourage activity, mention safety where critical'] },
+    { type:'checkbox', q:'Physical limitations to accommodate:',
+      opts:['Wheelchair users','Post-surgery recovery','Osteoporosis','Parkinson\'s disease','Post-stroke rehabilitation','COPD / breathlessness','Severe arthritis / limited grip'] }
+  ],
+  carpentry: [
+    { type:'checkbox', q:'Types of woodcraft projects to focus on:',
+      opts:['Simple decorative items','Practical home repairs','Traditional Asian joinery','Garden furniture','Upcycling & recycling projects','Miniature / model building','Painting, staining & finishing','Tool maintenance'] },
+    { type:'radio', q:'Tool complexity level:',
+      opts:['Hand tools only — no power tools for safety','Light power tools are okay (drills, sanders) with guidance','Full tool range with clear safety protocols','Adapt recommendations to each senior\'s stated ability'] }
+  ],
+  music_therapy: [
+    { type:'checkbox', q:'Music therapy approaches to include:',
+      opts:['Singing & vocal exercises','Simple percussion instruments','Music listening & reminiscence','Rhythm exercises for coordination','Song-writing & lyric creation','Traditional / folk music (local heritage)','Relaxation & guided imagery','Drumming circles'] },
+    { type:'radio', q:'Assumed musical background for most seniors:',
+      opts:['No musical training — keep everything accessible','Mix of backgrounds — adapt as needed','Many likely have folk / traditional music experience'] }
+  ],
+  art_therapy: [
+    { type:'checkbox', q:'Art therapy modalities to cover:',
+      opts:['Drawing & sketching','Watercolour painting','Collage & scrapbooking','Clay & sculpting','Batik & fabric art','Chinese brush painting','Colouring (mindfulness)','Photography','Digital art (simple apps)'] },
+    { type:'radio', q:'Therapeutic goal emphasis:',
+      opts:['Expression & emotional processing','Cognitive stimulation & fine motor skills','Social bonding & sharing','Cultural connection & reminiscence','General enjoyment — no specific therapeutic goal'] }
+  ],
+  counsellor: [
+    { type:'checkbox', q:'Key topics this counsellor should address:',
+      opts:['Loneliness & social isolation','Grief & loss of loved ones','Family relationship challenges','Retirement adjustment','Purpose & meaning in later life','Anxiety & worry','Life review & reminiscence','Intergenerational relationships','Fear of declining health'] },
+    { type:'radio', q:'Primary counselling approach:',
+      opts:['Empathetic listening — focus on validation and emotional support','Solution-focused — help find practical coping strategies','Strengths-based — affirm the senior\'s wisdom and resilience','Flexible mix depending on what the senior needs'] },
+    { type:'radio', q:'When a senior expresses severe distress or suicidal ideation:',
+      opts:['Listen with care, then immediately guide them to speak to staff','Provide the crisis hotline (1800-202-6868) immediately','Acknowledge their pain deeply, then offer both staff referral and hotline'] }
+  ],
+  tech_helper: [
+    { type:'checkbox', q:'Technology areas to assist with:',
+      opts:['Smartphones (calls, WhatsApp, photos)','Video calling (Zoom, FaceTime)','Government digital services (Singpass, HealthHub)','Online banking basics','Social media (Facebook, YouTube)','Online shopping safety','Scam awareness & prevention','iPad & tablet basics','Email basics'] },
+    { type:'radio', q:'Preferred teaching style:',
+      opts:['Step-by-step verbal instructions, very detailed','Ask the senior to describe what they see on screen first','Short numbered steps — maximum 3 actions at a time','Explain the concept first, then give the steps'] }
+  ],
+  gardening: [
+    { type:'checkbox', q:'Gardening areas to focus on:',
+      opts:['Container & pot gardening','Edible herbs & vegetables (e.g., pandan, kaffir lime)','Tropical flowers & ornamental plants','Indoor & balcony plants','Community garden programme activities','Adapted gardening for limited mobility','Therapeutic horticulture activities','Composting & sustainability'] }
+  ],
+  custom: []
+};
+
+/* Universal follow-up questions (always appended) */
+const universalQuestions = [
+  { type:'radio', q:'How should [Name] open each conversation?',
+    opts:['Warm greeting, then ask how the senior is feeling today','Introduce itself and ask what the senior needs help with','Share a cheerful tip or thought for the day, then ask how to help','Go directly to business — seniors prefer no small talk'] },
+  { type:'checkbox', q:'Sensitive topics this persona may encounter:',
+    opts:['Grief & loss','End-of-life conversations','Loneliness & isolation','Family conflict','Financial worry','Fear of declining health','Loss of independence','Chronic pain & suffering'] },
+  { type:'textarea', q:'Describe [Name]\'s "voice" in 2–3 sentences. Signature phrases? Mannerisms?',
+    ph:'e.g., Zhen speaks like a wise elder sharing tea with you. She often says "as the old masters teach us…" and uses seasonal metaphors. She never rushes and always ends with an encouragement.' },
+  { type:'radio', q:'Proactive engagement style:',
+    opts:['Proactively suggest tips, activities, and check-ins','Wait for the senior to ask — respect their autonomy','Gentle suggestions when the senior seems uncertain or quiet','Mirror the senior\'s energy and follow their lead'] },
+  { type:'textarea', q:'Cultural context: What beliefs, customs, or sensitivities should [Name] be aware of?',
+    ph:'e.g., Many seniors hold traditional beliefs — feng shui, auspicious dates, dietary taboos. Respect these without judgment. Some may reference folk remedies or ancestral practices.' }
+];
+
+/* ─────────────────────────────────────────────────────────────────────
+   KNOWLEDGE BASE RECOMMENDATIONS
+───────────────────────────────────────────────────────────────────── */
+const kbRole = {
+  tcm:[
+    { title:'TCM Fundamentals for Elderly Wellness',        pages:'~80pp',  desc:'Core concepts: Qi, Yin-Yang, Five Elements, meridians — in accessible language.' },
+    { title:'Herbal & Food Therapy Guide (Senior-Safe)',     pages:'~120pp', desc:'Herb safety profiles, food-as-medicine principles, remedies for common senior ailments.' },
+    { title:'TCM Seasonal Wellness Protocols',              pages:'~40pp',  desc:'Seasonal lifestyle and dietary adjustments according to TCM principles.' },
+    { title:'Tai Chi & Qigong for Seniors — Illustrated',   pages:'~60pp',  desc:'Gentle exercises with safety notes for older adults.' },
+    { title:'Drug-Herb Interaction Reference (Senior-Safe)', pages:'~30pp',  desc:'Common interactions between TCM herbs and medications taken by seniors.' },
+    { title:'FAQ: TCM Questions Seniors Ask',               pages:'~20pp',  desc:'Curated Q&A from real questions seniors ask about TCM in care settings.' }
+  ],
+  nutritionist:[
+    { title:'Nutrition Guidelines for Older Adults (MOH SG)',         pages:'~50pp', desc:'Singapore MOH evidence-based dietary guidelines for seniors.' },
+    { title:'Managing Chronic Conditions Through Diet',               pages:'~90pp', desc:'Dietary guidance for diabetes, hypertension, kidney disease, and heart disease.' },
+    { title:'Soft & Minced Food Cookbook for Seniors',                pages:'~70pp', desc:'Recipes and prep tips for seniors with swallowing difficulties.' },
+    { title:'Hawker Food Nutrition Guide',                            pages:'~40pp', desc:'Healthier choices and nutritional profiles for local hawker foods.' },
+    { title:'Malnutrition Prevention in Elderly',                     pages:'~35pp', desc:'Warning signs and strategies to prevent undernourishment.' }
+  ],
+  fitness:[
+    { title:'WHO Physical Activity Guidelines — Senior Adaptations',  pages:'~60pp', desc:'Evidence-based exercise guidelines adapted for older adults.' },
+    { title:'Fall Prevention Exercise Programme',                     pages:'~45pp', desc:'Structured balance and strength exercises to reduce fall risk.' },
+    { title:'Chair-Based Exercises for Frail Elderly',               pages:'~40pp', desc:'Illustrated seated routines for low-mobility seniors.' },
+    { title:'Post-Surgical Rehabilitation Guidelines (Hip/Knee)',     pages:'~55pp', desc:'Safe exercise progressions after common senior surgeries.' }
+  ],
+  carpentry:[
+    { title:'Woodworking Safety for Older Adults',              pages:'~30pp', desc:'Ergonomic tools, adapted safety protocols, and workspace setup.' },
+    { title:'Simple Woodcraft Projects — Step-by-Step',        pages:'~80pp', desc:'20+ beginner-friendly projects with illustrated instructions.' },
+    { title:'Traditional Asian Joinery Techniques',            pages:'~50pp', desc:'Cultural connection through traditional joinery craftsmanship.' },
+    { title:'Adaptive Tools for Limited Dexterity',            pages:'~25pp', desc:'Recommended tools and jigs for seniors with reduced grip or arthritis.' }
+  ],
+  music_therapy:[
+    { title:'Music Therapy & Dementia: Evidence & Practice',       pages:'~70pp', desc:'Research-backed music therapy approaches for cognitive health.' },
+    { title:'Singapore Folk Songs & Nostalgic Music Compendium',   pages:'~60pp', desc:'Lyrics and background of popular songs across generations and communities.' },
+    { title:'Rhythm & Movement Activities for Older Adults',       pages:'~40pp', desc:'Simple percussion activities and chair-based movement to music.' }
+  ],
+  art_therapy:[
+    { title:'Art Therapy for Older Adults: Clinical Guide',    pages:'~80pp', desc:'Therapeutic art activities, facilitation tips, and evidence base.' },
+    { title:'Watercolour Techniques for Beginners',            pages:'~55pp', desc:'Step-by-step guide to watercolour painting with minimal supplies.' },
+    { title:'Chinese Brush Painting Fundamentals',             pages:'~45pp', desc:'Traditional brush painting techniques with cultural context.' }
+  ],
+  counsellor:[
+    { title:'Counselling Older Adults: A Practical Guide',                    pages:'~90pp', desc:'Therapeutic approaches for seniors — grief, purpose, identity.' },
+    { title:'Active Ageing & Psychological Wellbeing',                        pages:'~60pp', desc:'Positive ageing frameworks, resilience, and mental health in later life.' },
+    { title:'Crisis Intervention Protocol for Seniors',                       pages:'~30pp', desc:'Responding to suicidal ideation, acute grief, and psychiatric crises.' },
+    { title:'Cultural Considerations in Senior Counselling (Singapore)',       pages:'~40pp', desc:'Multicultural competency guide for diverse elderly populations.' }
+  ],
+  tech_helper:[
+    { title:'Digital Literacy for Seniors (IMDA Guide)',             pages:'~70pp', desc:'IMDA-aligned digital skills curriculum for older adults.' },
+    { title:'Scam Awareness & Prevention for Seniors',               pages:'~40pp', desc:'Common scam types, red flags, and protective strategies.' },
+    { title:'Singpass & HealthHub Guide for Seniors',                pages:'~35pp', desc:'Step-by-step guide to key Singapore government digital services.' },
+    { title:'WhatsApp & Video Calling (Large Print Edition)',         pages:'~30pp', desc:'Large-text guide to messaging and video calling apps.' }
+  ],
+  gardening:[
+    { title:'Therapeutic Horticulture for Older Adults',      pages:'~65pp', desc:'Evidence-based gardening therapy principles and activity ideas.' },
+    { title:'Tropical Container Gardening (Singapore)',       pages:'~50pp', desc:'Growing vegetables and herbs in pots — adapted for Singapore climate.' },
+    { title:'Adaptive Gardening for Limited Mobility',        pages:'~40pp', desc:'Raised beds, ergonomic tools, and techniques for mobility-limited seniors.' }
+  ],
+  custom:[
+    { title:'[Role] Reference Manual & Best Practices',         pages:'varies', desc:'Core domain reference guide for this persona\'s area of expertise.' },
+    { title:'Senior-Specific Guidelines for [Role Domain]',     pages:'varies', desc:'Adaptations when applying this expertise with older adults.' },
+    { title:'FAQ — [Role Domain] for Seniors',                  pages:'varies', desc:'Common questions and answers relevant to senior users in this domain.' },
+    { title:'Safety Protocols for [Role Domain]',               pages:'varies', desc:'Emergency procedures and safety guidelines for this activity.' }
+  ]
+};
+
+const kbUniversal = [
+  { title:'Senior Care Communication Guide',                pages:'~25pp', desc:'Best practices for communicating with elderly — clarity, pacing, non-verbal cues.' },
+  { title:'Dementia Awareness & Communication Tips',        pages:'~30pp', desc:'Effectively communicating with seniors experiencing cognitive decline.' },
+  { title:'Singapore Senior Support Services Directory',    pages:'~20pp', desc:'Key hotlines, community resources, and referral pathways for seniors.' }
+];
+
+/* ─────────────────────────────────────────────────────────────────────
+   INIT OCEAN SLIDERS
+───────────────────────────────────────────────────────────────────── */
+function initOcean() {
+  const wrap = document.getElementById('oceanSliders');
+  wrap.innerHTML = oceanDefs.map(d => `
+    <div>
+      <div class="flex items-center justify-between mb-1.5">
+        <div class="flex items-center gap-1.5">
+          <span>${d.emoji}</span>
+          <span class="text-sm font-medium text-gray-800">${d.label}</span>
+        </div>
+        <span id="oval-${d.key}" class="text-sm font-bold text-indigo-600 w-5 text-right">${state.ocean[d.key]}</span>
+      </div>
+      <input type="range" min="1" max="10" value="${state.ocean[d.key]}"
+        class="ocean-range w-full"
+        id="oslider-${d.key}"
+        oninput="onOcean('${d.key}', this)"
+        style="${sliderGrad(state.ocean[d.key])}" />
+      <div class="flex justify-between mt-1">
+        <div>
+          <div class="text-[11px] font-medium text-gray-500">${d.lo}</div>
+          <div class="text-[10px] text-gray-400 max-w-[130px]">${d.loDesc}</div>
+        </div>
+        <div class="text-right">
+          <div class="text-[11px] font-medium text-gray-500">${d.hi}</div>
+          <div class="text-[10px] text-gray-400 max-w-[130px]">${d.hiDesc}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function sliderGrad(v) {
+  const pct = (v-1)/9*100;
+  return `background: linear-gradient(to right, #4f46e5 ${pct}%, #e5e7eb ${pct}%)`;
+}
+
+function onOcean(key, el) {
+  state.ocean[key] = +el.value;
+  document.getElementById(`oval-${key}`).textContent = el.value;
+  el.style = sliderGrad(+el.value);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   SHOW / HIDE SENIOR OPTS
+───────────────────────────────────────────────────────────────────── */
+document.querySelectorAll('[name="audience"]').forEach(r =>
+  r.addEventListener('change', () => {
+    document.getElementById('seniorOpts').classList.toggle('hidden', r.value !== 'Senior' || !r.checked);
+  })
+);
+
+/* ─────────────────────────────────────────────────────────────────────
+   SHOW / HIDE CUSTOM ROLE INPUT
+───────────────────────────────────────────────────────────────────── */
+document.getElementById('roleSelect').addEventListener('change', function() {
+  document.getElementById('customRoleWrap').classList.toggle('hidden', this.value !== 'custom');
+});
+
+/* ─────────────────────────────────────────────────────────────────────
+   COLLECT ROUND 1
+───────────────────────────────────────────────────────────────────── */
+function collectR1() {
+  const langs = [...document.querySelectorAll('[name="lang"]:checked')].map(e=>e.value);
+  const role  = document.getElementById('roleSelect').value;
+  state.r1 = {
+    charName    : document.getElementById('charName').value.trim(),
+    role,
+    customRole  : document.getElementById('customRole').value.trim(),
+    expertise   : document.getElementById('expertiseSelect').value,
+    shortDesc   : document.getElementById('shortDesc').value.trim(),
+    uniqueness  : document.getElementById('uniqueness').value.trim(),
+    audience    : document.querySelector('[name="audience"]:checked')?.value || 'Senior',
+    cogLevel    : document.querySelector('[name="cogLevel"]:checked')?.value || 'standard',
+    languages   : langs.length ? langs : ['English'],
+    tone        : document.querySelector('[name="tone"]:checked')?.value || 'Friendly',
+    primaryGoals: document.getElementById('primaryGoals').value.trim(),
+    hardLimits  : document.getElementById('hardLimits').value.trim(),
+    emergency   : document.querySelector('[name="emergency"]:checked')?.value || 'both',
+    ocean       : { ...state.ocean },
+    llmModel    : document.getElementById('llmModel').value
+  };
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   ROUND 1 → ROUND 2
+───────────────────────────────────────────────────────────────────── */
+function goToRound2() {
+  if (!document.getElementById('charName').value.trim()) { toast('Please enter a Character Name.'); return; }
+  if (!document.getElementById('roleSelect').value)      { toast('Please select a Role.'); return; }
+  if (!document.getElementById('primaryGoals').value.trim()) { toast('Please describe the Primary Goals.'); return; }
+
+  collectR1();
+  renderRound2();
+  switchPanel('round2');
+  activateStep(2);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   RENDER ROUND 2
+───────────────────────────────────────────────────────────────────── */
+function renderRound2() {
+  const { charName, role } = state.r1;
+  const display = role === 'custom' ? state.r1.customRole || 'Your Persona' : roleName(role);
+  const rqs   = (roleQuestions[role] || roleQuestions.custom);
+  const allQs = [...rqs, ...universalQuestions];
+
+  document.getElementById('round2').innerHTML = `
+    <div class="fade-in">
+      <div class="mb-7">
+        <div class="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-700 text-xs font-semibold px-3 py-1 rounded-full mb-2">Round 2 of 3</div>
+        <h2 class="text-2xl font-bold text-gray-900">Refine <span class="text-indigo-600">${charName}</span></h2>
+        <p class="text-gray-500 text-sm mt-1">A few deeper questions to make your ${display} persona robust, nuanced, and senior-ready.</p>
+      </div>
+
+      <div class="space-y-4" id="r2Questions">
+        ${allQs.map((q,i) => renderQ(q, i, charName)).join('')}
+      </div>
+
+      <div class="flex justify-between mt-8">
+        <button onclick="goBack(1)"
+          class="border border-gray-200 text-gray-600 font-medium px-5 py-2.5 rounded-xl text-sm hover:bg-gray-50 transition flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          Back
+        </button>
+        <button onclick="goToRound3()"
+          class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-semibold px-7 py-2.5 rounded-xl text-sm transition shadow-md flex items-center gap-2">
+          Generate Persona
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </button>
+      </div>
+    </div>
+  `;
+
+  /* attach pill-style event listeners for Round 2 */
+  document.getElementById('r2Questions').addEventListener('change', e => {
+    const inp = e.target;
+    if (inp.type === 'checkbox' && inp.dataset.r2) {
+      inp.nextElementSibling?.classList.toggle('border-indigo-500', inp.checked);
+      inp.nextElementSibling?.classList.toggle('bg-indigo-50', inp.checked);
+      inp.nextElementSibling?.classList.toggle('text-indigo-700', inp.checked);
+    }
+    if (inp.type === 'radio' && inp.dataset.r2) {
+      document.querySelectorAll(`[name="${inp.name}"]`).forEach(r => {
+        r.closest('label')?.classList.remove('border-indigo-500','bg-indigo-50');
+      });
+      inp.closest('label')?.classList.add('border-indigo-500','bg-indigo-50');
+    }
+  });
+}
+
+function renderQ(q, i, name) {
+  const qText = q.q.replace(/\[Name\]/g, name);
+  const wrap  = `<div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+    <p class="text-sm font-medium text-gray-800 mb-3 leading-relaxed">${qText}</p>
+    BODY
+  </div>`;
+
+  if (q.type === 'checkbox') {
+    return wrap.replace('BODY', `<div class="flex flex-wrap gap-2">
+      ${q.opts.map(o => `
+        <label>
+          <input type="checkbox" name="q${i}" value="${esc(o)}" data-r2="1" class="sr-only pill-input" />
+          <span class="pill-label">${o}</span>
+        </label>`).join('')}
+    </div>`);
+  }
+
+  if (q.type === 'radio') {
+    return wrap.replace('BODY', `<div class="flex flex-col gap-2">
+      ${q.opts.map(o => `
+        <label class="card-label cursor-pointer">
+          <input type="radio" name="q${i}" value="${esc(o)}" data-r2="1" class="card-radio mt-0.5" />
+          <span class="text-sm text-gray-700">${o}</span>
+        </label>`).join('')}
+    </div>`);
+  }
+
+  if (q.type === 'textarea') {
+    return wrap.replace('BODY', `<textarea rows="3" id="qt${i}" placeholder="${q.ph||''}"
+      class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition resize-none"></textarea>`);
+  }
+  return '';
+}
+
+function esc(s) { return s.replace(/"/g,'&quot;'); }
+
+/* ─────────────────────────────────────────────────────────────────────
+   COLLECT ROUND 2
+───────────────────────────────────────────────────────────────────── */
+function collectR2() {
+  const rqs   = roleQuestions[state.r1.role] || roleQuestions.custom;
+  const allQs = [...rqs, ...universalQuestions];
+  state.r2 = {};
+  allQs.forEach((q, i) => {
+    if (q.type === 'checkbox') {
+      state.r2[`q${i}`] = [...document.querySelectorAll(`[name="q${i}"]:checked`)].map(e=>e.value);
+    } else if (q.type === 'radio') {
+      state.r2[`q${i}`] = document.querySelector(`[name="q${i}"]:checked`)?.value || '';
+    } else if (q.type === 'textarea') {
+      state.r2[`q${i}`] = document.getElementById(`qt${i}`)?.value || '';
+    }
+  });
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   ROUND 2 → ROUND 3
+───────────────────────────────────────────────────────────────────── */
+function goToRound3() {
+  collectR2();
+  renderRound3();
+  switchPanel('round3');
+  activateStep(3);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   GENERATE SYSTEM PROMPT
+───────────────────────────────────────────────────────────────────── */
+function buildPrompt() {
+  const r1 = state.r1, r2 = state.r2;
+  const rqs = roleQuestions[r1.role] || roleQuestions.custom;
+  const allQs = [...rqs, ...universalQuestions];
+  const displayRole = r1.role === 'custom' ? r1.customRole : roleName(r1.role);
+
+  /* helpers to find universal question answers by content keyword */
+  const uqStart = rqs.length;
+  const findU = (keyword) => {
+    const idx = universalQuestions.findIndex(q => q.q.toLowerCase().includes(keyword));
+    return idx >= 0 ? (r2[`q${uqStart+idx}`] || '') : '';
+  };
+  const greeting    = findU('open each conversation');
+  const voiceDesc   = findU('voice');
+  const cultural    = findU('cultural');
+  const engagestyle = findU('proactive engagement');
+  const sensitiveRaw= findU('sensitive topics');
+  const sensitiveArr= Array.isArray(sensitiveRaw) ? sensitiveRaw : [];
+
+  /* OCEAN descriptions */
+  const O=r1.ocean.O, C=r1.ocean.C, E=r1.ocean.E, A=r1.ocean.A, N=r1.ocean.N;
+  const oDesc = O>=7 ? 'You are genuinely curious and open to new ideas. You enjoy exploring unconventional angles and creative explanations.'
+              : O<=3 ? 'You prefer proven, familiar methods that seniors trust. Your consistency and reliability are your strengths.'
+              : 'You balance curiosity with grounded, reliable guidance.';
+  const cDesc = C>=7 ? 'You are organised and methodical — you provide structured, step-by-step guidance and ensure nothing important is missed.'
+              : C<=3 ? 'You are flexible and go with the flow, adapting naturally to where the conversation leads.'
+              : 'You offer clear structure when helpful, but remain adaptable to the natural flow of each conversation.';
+  const eDesc = E>=7 ? 'You are warm and expressive — enthusiastic, chatty, and energetic. You bring positive energy to every exchange.'
+              : E<=3 ? 'You are calm and reflective. You listen deeply and speak thoughtfully — seniors feel truly heard.'
+              : 'You balance warmth and expressiveness with calm, attentive listening.';
+  const aDesc = A>=7 ? 'You are deeply empathetic and cooperative. You validate feelings readily and approach every senior with unconditional positive regard.'
+              : A<=3 ? 'You are direct and honest — you give clear, truthful guidance while remaining respectful.'
+              : 'You combine genuine empathy with honest, clear guidance.';
+  const nDesc = N>=7 ? 'You are emotionally attuned and sensitive, picking up on subtle cues and responding with great care.'
+              : N<=3 ? 'You are a steady, unflappable presence — seniors feel grounded and reassured in your consistency.'
+              : 'You remain emotionally steady while staying sensitive to each senior\'s needs.';
+
+  /* Cognitive level phrasing */
+  const cogPhrasing = {
+    standard  : 'Your seniors have full cognitive function. Engage with normal depth and richness of conversation.',
+    mild      : 'Some of your seniors may have mild memory concerns. Be patient, avoid overloading with information, and gently guide them back if they lose track.',
+    intensive : 'Your seniors need significant cognitive support. Keep EVERY response very short (3–5 sentences maximum). Use simple words. Repeat key points gently.'
+  }[r1.cogLevel] || '';
+
+  /* Emergency text */
+  const emergencyText = {
+    staff  : 'If a senior mentions a physical emergency (chest pain, difficulty breathing, fall, feeling faint), say immediately:\n"Please press your call button or tell a care staff member right now. Your safety is the most important thing."',
+    hotline: 'If a senior mentions an emergency, provide:\n- Emergency: 995\n- Senior Helpline: 1800-202-6868',
+    both   : 'If a senior mentions any emergency:\n1. Say: "Please press your call button or speak to a care staff member immediately."\n2. Provide: Emergency — 995 | Senior Helpline — 1800-202-6868'
+  }[r1.emergency] || '';
+
+  /* Role-specific answers */
+  const roleAnswers = rqs.map((q,i) => {
+    const val = r2[`q${i}`];
+    if (!val || (Array.isArray(val) && !val.length)) return null;
+    return `- ${q.q}: ${Array.isArray(val) ? val.join(', ') : val}`;
+  }).filter(Boolean).join('\n');
+
+  return `***ROLE AND PERSONA***
+You are **${r1.charName.toUpperCase()}**, a ${r1.expertise.toLowerCase()} with deep expertise as a ${displayRole}.
+
+${r1.uniqueness ? r1.uniqueness + '\n' : ''}${voiceDesc ? voiceDesc + '\n' : ''}
+***WHO YOU SERVE***
+You are speaking with **${r1.audience.toLowerCase()} residents** at a senior care facility. Primary language(s): ${r1.languages.join(', ')}.
+
+${cogPhrasing}
+
+${cultural ? '***CULTURAL AWARENESS***\n' + cultural + '\n' : ''}
+***YOUR MISSION***
+${r1.primaryGoals}
+
+***PERSONALITY (OCEAN)***
+- Openness (${O}/10): ${oDesc}
+- Conscientiousness (${C}/10): ${cDesc}
+- Extraversion (${E}/10): ${eDesc}
+- Agreeableness (${A}/10): ${aDesc}
+- Emotional Stability (${N}/10): ${nDesc}
+
+***TONE & COMMUNICATION***
+Overall tone: ${r1.tone} — ${{'Empathetic':'warm, validating, emotionally attuned','Professional':'knowledgeable, clear, trustworthy','Friendly':'approachable, conversational, relaxed','Motivational':'uplifting, encouraging, action-oriented'}[r1.tone]||r1.tone}
+
+- Use simple, everyday language. Avoid jargon.
+- Speak at a measured, unhurried pace.
+- Regularly check that the senior understands.
+- If the senior speaks in Mandarin, dialect, or another preferred language, respond in that language where possible.
+${engagestyle ? '- Engagement: ' + engagestyle : ''}
+
+***STARTING A CONVERSATION***
+${greeting || 'Begin with a warm, friendly greeting. Ask how the senior is feeling before getting into the topic.'}
+
+Example opening: "Hello! So lovely to chat with you today. How are you feeling? Is there something I can help you with, or shall we just have a friendly chat?"
+
+***DOMAIN KNOWLEDGE***
+${roleAnswers || `As a ${displayRole}, you have deep knowledge relevant to seniors' health, wellbeing, and quality of life in this area.`}
+
+***SENSITIVE TOPICS***
+${sensitiveArr.length ? `You may encounter conversations about: ${sensitiveArr.join(', ')}.\n\nApproach these with deep empathy. Listen first. Validate feelings. Never dismiss or minimise their emotions. Do not offer unsolicited advice — ask if they would like your thoughts before sharing.`
+: 'Approach all sensitive topics with deep empathy. Listen first, validate feelings, and respond with patience and care.'}
+
+***EMERGENCY PROTOCOL***
+${emergencyText}
+
+***BOUNDARIES & LIMITATIONS***
+${r1.hardLimits || 'Never provide advice that should come from a licensed medical, legal, or financial professional. Always refer seniors to qualified staff or professionals for complex matters.'}
+
+- You are an AI assistant, not a substitute for medical, psychological, or professional care.
+- When in doubt, encourage the senior to speak with a care staff member.
+- Prioritise the senior's safety and dignity above all else.
+
+***QUALITY CHECKLIST***
+Before every response, ask yourself:
+✓ Is this response safe, accurate, and age-appropriate?
+✓ Have I used language simple enough for this senior?
+✓ Am I being warm, patient, and respectful?
+✓ Should this be referred to a care professional?`.trim();
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   RENDER ROUND 3
+───────────────────────────────────────────────────────────────────── */
+function renderRound3() {
+  const r1      = state.r1;
+  const prompt  = buildPrompt();
+  const kbItems = [...(kbRole[r1.role] || kbRole.custom), ...kbUniversal];
+  const displayRole = r1.role === 'custom' ? r1.customRole : roleName(r1.role);
+
+  document.getElementById('round3').innerHTML = `
+    <div class="fade-in">
+      <div class="mb-7">
+        <div class="inline-flex items-center gap-1.5 bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full mb-2">Round 3 of 3</div>
+        <h2 class="text-2xl font-bold text-gray-900">✨ Your Persona is Ready</h2>
+        <p class="text-gray-500 text-sm mt-1">Review, refine, and copy everything into your agent config.</p>
+      </div>
+
+      <!-- Summary Banner -->
+      <div class="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl p-5 mb-5 text-white flex items-center gap-4">
+        <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center text-3xl shrink-0">${roleEmoji(r1.role)}</div>
+        <div class="flex-1 min-w-0">
+          <div class="font-bold text-lg leading-none">${r1.charName}</div>
+          <div class="text-indigo-200 text-sm mt-0.5">${displayRole} · ${r1.expertise}</div>
+          <div class="flex flex-wrap gap-1.5 mt-2">
+            <span class="bg-white/20 text-xs px-2 py-0.5 rounded-full">${r1.audience}</span>
+            <span class="bg-white/20 text-xs px-2 py-0.5 rounded-full">${r1.tone} tone</span>
+            <span class="bg-white/20 text-xs px-2 py-0.5 rounded-full">${r1.languages.join(', ')}</span>
+            <span class="bg-white/20 text-xs px-2 py-0.5 rounded-full">${r1.llmModel}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-5">
+        <div class="flex border-b border-gray-100 overflow-x-auto">
+          <button class="tab-btn active" onclick="switchTab('prompt',this)">📄 System Prompt</button>
+          <button class="tab-btn" onclick="switchTab('kb',this)">📚 Knowledge Base</button>
+          <button class="tab-btn" onclick="switchTab('ocean',this)">🧠 OCEAN Config</button>
+          <button class="tab-btn" onclick="switchTab('fields',this)">⚙️ Form Fields</button>
+        </div>
+
+        <!-- PROMPT TAB -->
+        <div id="tab-prompt" class="p-5">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-xs text-gray-500">Review and edit the generated system prompt, then copy it into the agent config.</p>
+            <button onclick="copyText('promptTA','Prompt copied!')"
+              class="flex items-center gap-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              Copy
+            </button>
+          </div>
+          <textarea id="promptTA" rows="26"
+            class="w-full border border-gray-100 rounded-xl px-4 py-3 prompt-area focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none bg-gray-50"
+          >${prompt}</textarea>
+          <div class="mt-3 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-xs text-amber-700">
+            💡 <strong>Tip:</strong> You can edit this prompt directly above before copying. Paste it into the <strong>System Prompt</strong> field in your agent config.
+          </div>
+        </div>
+
+        <!-- KB TAB -->
+        <div id="tab-kb" class="p-5 hidden">
+          <p class="text-xs text-gray-500 mb-4">Upload these documents to ${r1.charName}'s knowledge base. Priority order: role-specific first, then universal.</p>
+          <div class="space-y-3">
+            ${kbItems.map((doc, i) => {
+              const isRole = i < (kbRole[r1.role]||kbRole.custom).length;
+              return `
+              <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                <div class="w-9 h-9 bg-red-100 text-red-600 font-bold text-[10px] rounded-lg flex items-center justify-center shrink-0">PDF</div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-start justify-between gap-2 flex-wrap">
+                    <span class="text-sm font-medium text-gray-900">${doc.title}</span>
+                    <span class="text-[11px] text-gray-400 shrink-0">${doc.pages}</span>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-0.5">${doc.desc}</p>
+                </div>
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${isRole?'badge-role':'badge-universal'}">${isRole?'Role-specific':'Universal'}</span>
+              </div>`;
+            }).join('')}
+          </div>
+          <div class="mt-4 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-xs text-blue-700">
+            📌 <strong>Upload order:</strong> Start with role-specific PDFs, then add universal ones. You can also add your facility's own SOPs, intake forms, and activity guides.
+          </div>
+        </div>
+
+        <!-- OCEAN TAB -->
+        <div id="tab-ocean" class="p-5 hidden">
+          <p class="text-xs text-gray-500 mb-4">Copy these values into the <strong>OCEAN Personality Traits</strong> tab in your agent config.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-5 gap-3">
+            ${oceanDefs.map(d => `
+            <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 text-center">
+              <div class="text-2xl mb-1">${d.emoji}</div>
+              <div class="text-xs font-semibold text-gray-700 mb-2">${d.label}</div>
+              <div class="text-3xl font-bold text-indigo-600 mb-1">${r1.ocean[d.key]}</div>
+              <div class="text-[10px] text-gray-400">/10</div>
+              <div class="mt-2 bg-gray-200 rounded-full h-1.5">
+                <div class="bg-indigo-500 h-1.5 rounded-full" style="width:${r1.ocean[d.key]/10*100}%"></div>
+              </div>
+              <div class="text-[10px] text-gray-500 mt-1.5">${r1.ocean[d.key]<=3?d.lo:r1.ocean[d.key]>=7?d.hi:'Balanced'}</div>
+            </div>`).join('')}
+          </div>
+          <div class="mt-4 grid grid-cols-1 gap-3">
+            ${oceanDefs.map(d => {
+              const v = r1.ocean[d.key];
+              const desc = v>=7?`(${v}/10) ${d.hiDesc}`:v<=3?`(${v}/10) ${d.loDesc}`:`(${v}/10) Balanced between ${d.lo} and ${d.hi}`;
+              return `<div class="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 text-sm">
+                <span class="text-lg shrink-0">${d.emoji}</span>
+                <span class="font-medium text-gray-700 w-36 shrink-0">${d.label}</span>
+                <span class="text-gray-500 text-xs">${desc}</span>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- FIELDS TAB -->
+        <div id="tab-fields" class="p-5 hidden">
+          <p class="text-xs text-gray-500 mb-4">Copy these values into the corresponding fields in your agent <strong>Configuration</strong> tab.</p>
+          <div class="space-y-3">
+            ${[
+              ['Character Name', r1.charName],
+              ['Role',           displayRole],
+              ['Expertise',      r1.expertise],
+              ['Target Audience',r1.audience],
+              ['Tone',           r1.tone],
+              ['Language',       r1.languages.join(', ')],
+              ['LLM Model',      r1.llmModel],
+              ['Knowledge Base', (kbRole[r1.role]||kbRole.custom).map(k=>k.title.split('(')[0].trim()).join('; ')],
+              ['Usage Policy',   'Prioritize Knowledge Base']
+            ].map(([label,val]) => `
+              <div class="flex items-start gap-3 border border-gray-100 rounded-xl px-4 py-3 bg-gray-50">
+                <span class="text-xs font-semibold text-gray-500 w-32 shrink-0 pt-0.5">${label}</span>
+                <span class="text-sm text-gray-800 flex-1">${val}</span>
+                <button onclick="copyStr('${val.replace(/'/g,"\\'")}','Copied!')"
+                  class="text-gray-400 hover:text-indigo-600 transition shrink-0">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                </button>
+              </div>`).join('')}
+          </div>
+        </div>
+
+      </div><!-- /tabs wrapper -->
+
+      <div class="flex items-center justify-between">
+        <div class="flex gap-2">
+          <button onclick="goBack(2)"
+            class="border border-gray-200 text-gray-600 font-medium px-5 py-2.5 rounded-xl text-sm hover:bg-gray-50 transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Back
+          </button>
+          <button onclick="startOver()"
+            class="border border-gray-200 text-gray-500 font-medium px-5 py-2.5 rounded-xl text-sm hover:bg-gray-50 transition">
+            Start Over
+          </button>
+        </div>
+        <button onclick="exportAll()"
+          class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold px-7 py-2.5 rounded-xl text-sm transition shadow-md flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Export Config
+        </button>
+      </div>
+
+    </div>
+  `;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   TAB SWITCHING
+───────────────────────────────────────────────────────────────────── */
+function switchTab(name, btn) {
+  document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.remove('hidden');
+  btn.classList.add('active');
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   NAV HELPERS
+───────────────────────────────────────────────────────────────────── */
+function switchPanel(id) {
+  ['round1','round2','round3'].forEach(r => document.getElementById(r).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBack(toRound) {
+  switchPanel(`round${toRound}`);
+  document.getElementById(`round${toRound}`).classList.add('fade-in');
+  // Deactivate later steps
+  if (toRound < 3) {
+    const c3 = document.getElementById('s3-circle');
+    c3.className = 'w-7 h-7 rounded-full bg-gray-200 text-gray-500 text-xs font-bold flex items-center justify-center shrink-0 transition-all';
+    document.getElementById('s3-label').className = 'text-xs text-gray-400 hidden sm:block whitespace-nowrap';
+    document.getElementById('line-23').classList.remove('done');
+  }
+  if (toRound < 2) {
+    const c2 = document.getElementById('s2-circle');
+    c2.className = 'w-7 h-7 rounded-full bg-gray-200 text-gray-500 text-xs font-bold flex items-center justify-center shrink-0 transition-all';
+    document.getElementById('s2-label').className = 'text-xs text-gray-400 hidden sm:block whitespace-nowrap';
+    document.getElementById('line-12').classList.remove('done');
+  }
+}
+
+function activateStep(n) {
+  if (n >= 2) {
+    document.getElementById('s2-circle').className = 'w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center shrink-0 transition-all';
+    document.getElementById('s2-label').className  = 'text-xs font-medium text-indigo-700 hidden sm:block whitespace-nowrap';
+    document.getElementById('line-12').classList.add('done');
+  }
+  if (n >= 3) {
+    document.getElementById('s3-circle').className = 'w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center shrink-0 transition-all';
+    document.getElementById('s3-label').className  = 'text-xs font-medium text-indigo-700 hidden sm:block whitespace-nowrap';
+    document.getElementById('line-23').classList.add('done');
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   COPY / EXPORT / START OVER
+───────────────────────────────────────────────────────────────────── */
+function copyText(id, msg) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.value || el.textContent).then(() => toast(msg, 'success'));
+}
+function copyStr(str, msg) {
+  navigator.clipboard.writeText(str).then(() => toast(msg, 'success'));
+}
+
+function exportAll() {
+  const r1    = state.r1;
+  const prompt= document.getElementById('promptTA')?.value || buildPrompt();
+  const kbItems= [...(kbRole[r1.role]||kbRole.custom), ...kbUniversal];
+  const displayRole = r1.role === 'custom' ? r1.customRole : roleName(r1.role);
+
+  const kbText = kbItems.map((d,i)=>`${i+1}. ${d.title} (${d.pages})\n   ${d.desc}`).join('\n\n');
+  const oceanText = oceanDefs.map(d=>`${d.label}: ${r1.ocean[d.key]}/10`).join('\n');
+  const fieldsText = [
+    `Character Name: ${r1.charName}`,`Role: ${displayRole}`,`Expertise: ${r1.expertise}`,
+    `Target Audience: ${r1.audience}`,`Tone: ${r1.tone}`,`Language: ${r1.languages.join(', ')}`,
+    `LLM Model: ${r1.llmModel}`,`Usage Policy: Prioritize Knowledge Base`
+  ].join('\n');
+
+  const out = `AGENTIC PERSONA CONFIGURATION
+Generated: ${new Date().toLocaleDateString('en-SG',{dateStyle:'long'})}
+${'='.repeat(50)}
+
+AGENT CONFIG FIELDS
+${'─'.repeat(50)}
+${fieldsText}
+
+OCEAN PERSONALITY TRAITS
+${'─'.repeat(50)}
+${oceanText}
+
+SYSTEM PROMPT
+${'─'.repeat(50)}
+${prompt}
+
+RECOMMENDED KNOWLEDGE BASE
+${'─'.repeat(50)}
+${kbText}
+
+${'='.repeat(50)}
+Generated by Persona Builder
+`;
+
+  const blob = new Blob([out], { type:'text/plain' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `${r1.charName.replace(/\s+/g,'_')}_PersonaConfig.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Config exported!', 'success');
+}
+
+function startOver() {
+  if (confirm('Clear all progress and start over?')) location.reload();
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   TOAST
+───────────────────────────────────────────────────────────────────── */
+function toast(msg, type='error') {
+  const el = document.createElement('div');
+  el.className = `px-5 py-3 rounded-xl shadow-lg text-sm font-medium text-white pointer-events-auto mb-2 ${type==='success'?'bg-emerald-500':'bg-red-500'}`;
+  el.textContent = msg;
+  document.getElementById('toast').appendChild(el);
+  setTimeout(()=>el.remove(), 2800);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   INIT
+───────────────────────────────────────────────────────────────────── */
+initOcean();
+</script>
+</body>
+</html>
