@@ -4,155 +4,139 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Agentic Persona Builder</title>
+  <script src="config.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
     * { font-family: 'Inter', sans-serif; }
 
     .fade-in { animation: fadeIn 0.35s ease both; }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(14px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from { opacity:0; transform:translateY(14px); }
+      to   { opacity:1; transform:translateY(0); }
     }
 
-    /* OCEAN range slider */
-    .ocean-range {
-      -webkit-appearance: none;
-      appearance: none;
-      height: 6px;
-      border-radius: 99px;
-      outline: none;
-      cursor: pointer;
-      transition: opacity .2s;
-    }
+    /* OCEAN slider */
+    .ocean-range { -webkit-appearance:none; appearance:none; height:6px; border-radius:99px; outline:none; cursor:pointer; }
     .ocean-range::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 20px; height: 20px;
-      border-radius: 50%;
-      background: #4f46e5;
-      border: 3px solid #fff;
-      box-shadow: 0 1px 6px rgba(0,0,0,.25);
-      cursor: pointer;
-      transition: transform .15s;
+      -webkit-appearance:none; width:20px; height:20px; border-radius:50%;
+      background:#4f46e5; border:3px solid #fff; box-shadow:0 1px 6px rgba(0,0,0,.25);
+      cursor:pointer; transition:transform .15s;
     }
-    .ocean-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    .ocean-range::-webkit-slider-thumb:hover { transform:scale(1.2); }
 
-    /* Pill toggle (checkbox / radio styled as pill) */
-    .pill-input { display: none; }
+    /* Pill toggles */
+    .pill-input { display:none; }
     .pill-label {
-      display: inline-flex; align-items: center;
-      padding: 6px 14px; border-radius: 99px;
-      border: 1.5px solid #d1d5db;
-      font-size: 13px; font-weight: 500; color: #6b7280;
-      cursor: pointer; user-select: none;
-      transition: border-color .15s, background .15s, color .15s;
-      white-space: nowrap;
+      display:inline-flex; align-items:center; padding:6px 14px; border-radius:99px;
+      border:1.5px solid #d1d5db; font-size:13px; font-weight:500; color:#6b7280;
+      cursor:pointer; user-select:none; transition:border-color .15s, background .15s, color .15s; white-space:nowrap;
     }
-    .pill-input:checked + .pill-label {
-      border-color: #4f46e5;
-      background: #eef2ff;
-      color: #4338ca;
-    }
+    .pill-input:checked + .pill-label { border-color:#4f46e5; background:#eef2ff; color:#4338ca; }
 
-    /* Card radio option */
-    .card-radio { display: none; }
+    /* Card radio/checkbox */
+    .card-radio { display:none; }
     .card-label {
-      display: flex; align-items: flex-start; gap: 10px;
-      padding: 12px 14px; border-radius: 12px;
-      border: 1.5px solid #e5e7eb;
-      cursor: pointer; transition: border-color .15s, background .15s;
+      display:flex; align-items:flex-start; gap:10px; padding:12px 14px;
+      border-radius:12px; border:1.5px solid #e5e7eb; cursor:pointer;
+      transition:border-color .15s, background .15s;
     }
-    .card-radio:checked + .card-label {
-      border-color: #4f46e5;
-      background: #f5f3ff;
-    }
+    .card-radio:checked + .card-label { border-color:#4f46e5; background:#f5f3ff; }
 
-    /* Tab button */
-    .tab-btn {
-      padding: 12px 20px; font-size: 13px; font-weight: 500;
-      color: #6b7280; border-bottom: 2px solid transparent;
-      transition: color .15s, border-color .15s;
-      cursor: pointer; white-space: nowrap;
-    }
-    .tab-btn.active { color: #4f46e5; border-bottom-color: #4f46e5; }
+    /* Tabs */
+    .tab-btn { padding:12px 20px; font-size:13px; font-weight:500; color:#6b7280; border-bottom:2px solid transparent; transition:color .15s, border-color .15s; cursor:pointer; white-space:nowrap; }
+    .tab-btn.active { color:#4f46e5; border-bottom-color:#4f46e5; }
 
-    /* Monospace prompt area */
-    .prompt-area {
-      font-family: 'Courier New', monospace;
-      font-size: 12.5px; line-height: 1.75;
-      color: #1e293b;
-    }
+    /* Prompt */
+    .prompt-area { font-family:'Courier New',monospace; font-size:12.5px; line-height:1.75; color:#1e293b; }
 
-    /* Smooth step connector fill */
-    .step-line { height: 2px; flex: 1; background: #e5e7eb; transition: background .4s; }
-    .step-line.done { background: #4f46e5; }
+    /* Progress line */
+    .step-line { height:2px; flex:1; background:#e5e7eb; transition:background .4s; }
+    .step-line.done { background:#4f46e5; }
 
     /* Tooltip */
-    .tooltip { position: relative; }
+    .tooltip { position:relative; }
     .tooltip .tip {
-      display: none; position: absolute; bottom: 110%; left: 50%;
-      transform: translateX(-50%);
-      background: #1e293b; color: #fff; font-size: 11px;
-      padding: 5px 10px; border-radius: 6px;
-      width: 200px; text-align: center; z-index: 20;
-      white-space: normal; pointer-events: none;
+      display:none; position:absolute; bottom:110%; left:50%; transform:translateX(-50%);
+      background:#1e293b; color:#fff; font-size:11px; padding:5px 10px; border-radius:6px;
+      width:200px; text-align:center; z-index:20; white-space:normal; pointer-events:none;
     }
-    .tooltip:hover .tip { display: block; }
+    .tooltip:hover .tip { display:block; }
 
-    /* KB card priority badge */
-    .badge-role { background: #ede9fe; color: #5b21b6; }
-    .badge-universal { background: #f1f5f9; color: #64748b; }
+    /* KB priority badges */
+    .badge-high { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; }
+    .badge-medium { background:#fffbeb; color:#d97706; border:1px solid #fde68a; }
+    .badge-low { background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; }
+    .badge-role { background:#ede9fe; color:#5b21b6; }
+    .badge-universal { background:#f1f5f9; color:#64748b; }
+
+    /* Loading spinner */
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .spinner { animation:spin 0.8s linear infinite; }
+
+    /* Keyword tag */
+    .kw-tag {
+      display:inline-flex; align-items:center; gap:3px;
+      background:#f0f9ff; color:#0369a1; border:1px solid #bae6fd;
+      font-size:10px; font-weight:500; padding:2px 7px; border-radius:99px;
+      font-family:'Courier New',monospace; cursor:pointer; transition:background .15s;
+      user-select:none;
+    }
+    .kw-tag:hover { background:#e0f2fe; }
+    .kw-tag:active { background:#bae6fd; }
+
+    /* AI insight card */
+    .ai-card { background:linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%); border:1px solid #c7d2fe; }
+
+    /* Rationale chip */
+    .rationale-chip { font-size:10px; color:#7c3aed; background:#f5f3ff; border:1px solid #ddd6fe; padding:2px 8px; border-radius:99px; display:inline-flex; align-items:center; gap:3px; }
   </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
 
-<!-- ─── HEADER ─────────────────────────────────────────────────────── -->
+<!-- ─── HEADER ──────────────────────────────────────────────────────── -->
 <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
   <div class="max-w-4xl mx-auto px-5 py-3 flex items-center justify-between gap-4">
-    <!-- Logo -->
     <div class="flex items-center gap-2.5 shrink-0">
       <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-        <svg class="w-4.5 h-4.5 text-white w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
         </svg>
       </div>
       <div>
         <div class="font-bold text-gray-900 text-sm leading-none">Persona Builder</div>
-        <div class="text-[10px] text-gray-400 leading-none mt-0.5">Agentic AI Config Tool</div>
+        <div class="text-[10px] text-gray-400 leading-none mt-0.5">Powered by DeepSeek AI</div>
       </div>
     </div>
 
     <!-- Progress steps -->
     <div class="flex items-center gap-1 flex-1 max-w-sm mx-auto">
-      <!-- Step 1 -->
       <div class="flex items-center gap-1.5">
-        <div id="s1-circle"
-          class="w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center shrink-0 transition-all">1</div>
+        <div id="s1-circle" class="w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center shrink-0 transition-all">1</div>
         <span id="s1-label" class="text-xs font-medium text-indigo-700 hidden sm:block whitespace-nowrap">Foundation</span>
       </div>
       <div class="step-line" id="line-12"></div>
-      <!-- Step 2 -->
       <div class="flex items-center gap-1.5">
-        <div id="s2-circle"
-          class="w-7 h-7 rounded-full bg-gray-200 text-gray-500 text-xs font-bold flex items-center justify-center shrink-0 transition-all">2</div>
+        <div id="s2-circle" class="w-7 h-7 rounded-full bg-gray-200 text-gray-500 text-xs font-bold flex items-center justify-center shrink-0 transition-all">2</div>
         <span id="s2-label" class="text-xs text-gray-400 hidden sm:block whitespace-nowrap">Refinement</span>
       </div>
       <div class="step-line" id="line-23"></div>
-      <!-- Step 3 -->
       <div class="flex items-center gap-1.5">
-        <div id="s3-circle"
-          class="w-7 h-7 rounded-full bg-gray-200 text-gray-500 text-xs font-bold flex items-center justify-center shrink-0 transition-all">3</div>
+        <div id="s3-circle" class="w-7 h-7 rounded-full bg-gray-200 text-gray-500 text-xs font-bold flex items-center justify-center shrink-0 transition-all">3</div>
         <span id="s3-label" class="text-xs text-gray-400 hidden sm:block whitespace-nowrap">Output</span>
       </div>
     </div>
 
-    <div class="w-20 shrink-0"></div><!-- spacer -->
+    <!-- DeepSeek badge -->
+    <div class="flex items-center gap-1.5 shrink-0">
+      <div id="aiStatusDot" class="w-2 h-2 rounded-full bg-gray-300"></div>
+      <span id="aiStatusLabel" class="text-[10px] text-gray-400 hidden sm:block">DeepSeek</span>
+    </div>
   </div>
 </header>
 
-<!-- ─── MAIN ───────────────────────────────────────────────────────── -->
+<!-- ─── MAIN ────────────────────────────────────────────────────────── -->
 <main class="max-w-4xl mx-auto px-5 py-8">
 
   <!-- ══════════════════════════════════════════════════════════════════
@@ -161,39 +145,28 @@
   <div id="round1" class="fade-in">
 
     <div class="mb-7">
-      <div class="inline-flex items-center gap-1.5 bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full mb-2">
-        Round 1 of 3
-      </div>
+      <div class="inline-flex items-center gap-1.5 bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full mb-2">Round 1 of 3</div>
       <h2 class="text-2xl font-bold text-gray-900">Build Your Persona Foundation</h2>
-      <p class="text-gray-500 text-sm mt-1">Define the core identity, personality, and purpose of your AI persona.</p>
+      <p class="text-gray-500 text-sm mt-1">Define the core identity, personality and purpose. DeepSeek will analyse this to generate refined follow-up questions in Round 2.</p>
     </div>
 
-    <!-- ── A. AGENT IDENTITY ───────────────────────────────────────── -->
+    <!-- A. AGENT IDENTITY -->
     <div class="bg-white rounded-2xl p-6 mb-5 border border-gray-100 shadow-sm">
       <h3 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
         <span class="w-5 h-5 rounded bg-indigo-100 text-indigo-700 text-[10px] font-bold flex items-center justify-center">A</span>
         Agent Identity
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
         <div>
-          <label class="block text-xs font-medium text-gray-600 mb-1">
-            Character Name <span class="text-red-400">*</span>
-          </label>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Character Name <span class="text-red-400">*</span></label>
           <input id="charName" type="text" placeholder="e.g., Zhen, Auntie Rose, Coach Ali"
             class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition" />
         </div>
-
         <div>
-          <label class="block text-xs font-medium text-gray-600 mb-1">
-            Role <span class="text-red-400">*</span>
-            <span class="tooltip ml-1 inline-block cursor-help text-gray-400">
-              &#9432;
-              <span class="tip">The broad role category (e.g., TCM Advisor, Nutritionist). Maps to the "Role" field in the agent config.</span>
-            </span>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Role <span class="text-red-400">*</span>
+            <span class="tooltip ml-1 inline-block cursor-help text-gray-400">&#9432;<span class="tip">Broad role category — e.g., TCM Advisor, Nutritionist.</span></span>
           </label>
-          <select id="roleSelect"
-            class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white transition">
+          <select id="roleSelect" class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white transition">
             <option value="">Select a role…</option>
             <option value="tcm">🌿 TCM Advisor</option>
             <option value="nutritionist">🥗 Nutritionist</option>
@@ -207,190 +180,98 @@
             <option value="custom">⚙️ Custom Role…</option>
           </select>
         </div>
-
         <div id="customRoleWrap" class="hidden">
           <label class="block text-xs font-medium text-gray-600 mb-1">Custom Role Name</label>
           <input id="customRole" type="text" placeholder="e.g., Financial Literacy Guide"
             class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition" />
         </div>
-
         <div>
-          <label class="block text-xs font-medium text-gray-600 mb-1">
-            Expertise
-            <span class="tooltip ml-1 inline-block cursor-help text-gray-400">
-              &#9432;
-              <span class="tip">The persona's specific expertise style — Advisor, Coach, Companion, Educator, Therapist, etc.</span>
-            </span>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Expertise
+            <span class="tooltip ml-1 inline-block cursor-help text-gray-400">&#9432;<span class="tip">The persona's function style — Advisor, Coach, Companion, etc.</span></span>
           </label>
-          <select id="expertiseSelect"
-            class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white transition">
-            <option value="Advisor">Advisor</option>
-            <option value="Coach">Coach</option>
-            <option value="Companion">Companion</option>
-            <option value="Educator">Educator</option>
-            <option value="Therapist">Therapist</option>
-            <option value="Guide">Guide</option>
-            <option value="Consultant">Consultant</option>
+          <select id="expertiseSelect" class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white transition">
+            <option>Advisor</option><option>Coach</option><option>Companion</option>
+            <option>Educator</option><option>Therapist</option><option>Guide</option><option>Consultant</option>
           </select>
         </div>
-
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">LLM Model</label>
-          <select id="llmModel"
-            class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white transition">
+          <select id="llmModel" class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white transition">
             <option>[DEV] - Alibaba Qwen</option>
-            <option>Claude Sonnet 4.6</option>
-            <option>Claude Haiku 4.5</option>
-            <option>GPT-4o</option>
-            <option>GPT-4o Mini</option>
+            <option>Claude Sonnet 4.6</option><option>Claude Haiku 4.5</option>
+            <option>GPT-4o</option><option>GPT-4o Mini</option>
           </select>
         </div>
-
         <div class="sm:col-span-2">
-          <label class="block text-xs font-medium text-gray-600 mb-1">
-            One-line description <span class="text-red-400">*</span>
-          </label>
-          <input id="shortDesc" type="text"
-            placeholder="e.g., Provides guidance and insight on Traditional Chinese Medicine"
+          <label class="block text-xs font-medium text-gray-600 mb-1">One-line description <span class="text-red-400">*</span></label>
+          <input id="shortDesc" type="text" placeholder="e.g., Provides guidance and insight on Traditional Chinese Medicine"
             class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition" />
         </div>
-
         <div class="sm:col-span-2">
           <label class="block text-xs font-medium text-gray-600 mb-1">What makes this persona unique?</label>
-          <textarea id="uniqueness" rows="2"
-            placeholder="e.g., Zhen blends classical TCM wisdom with modern evidence. She speaks with warmth, uses everyday analogies, and always relates ancient principles to daily life."
+          <textarea id="uniqueness" rows="2" placeholder="e.g., Zhen blends classical TCM wisdom with modern evidence. She speaks with warmth, uses everyday analogies, and always relates ancient principles to daily life."
             class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition resize-none"></textarea>
         </div>
-
       </div>
     </div>
 
-    <!-- ── B. TARGET AUDIENCE & LANGUAGE ─────────────────────────── -->
+    <!-- B. TARGET AUDIENCE & LANGUAGE -->
     <div class="bg-white rounded-2xl p-6 mb-5 border border-gray-100 shadow-sm">
       <h3 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
         <span class="w-5 h-5 rounded bg-emerald-100 text-emerald-700 text-[10px] font-bold flex items-center justify-center">B</span>
         Target Audience & Language
       </h3>
-
       <div class="space-y-5">
-
-        <!-- Audience -->
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-2">Primary Audience</label>
           <div class="flex flex-wrap gap-2">
             <input class="pill-input" type="radio" name="audience" id="aud-senior" value="Senior" checked />
             <label class="pill-label" for="aud-senior">🧓 Senior</label>
-
             <input class="pill-input" type="radio" name="audience" id="aud-adult" value="Adult" />
             <label class="pill-label" for="aud-adult">👤 Adult</label>
-
             <input class="pill-input" type="radio" name="audience" id="aud-teen" value="Teen" />
             <label class="pill-label" for="aud-teen">🧑 Teen</label>
-
             <input class="pill-input" type="radio" name="audience" id="aud-child" value="Child" />
             <label class="pill-label" for="aud-child">🧒 Child</label>
           </div>
         </div>
-
-        <!-- Senior-specific sub-options (shown when Senior selected) -->
         <div id="seniorOpts">
-          <label class="block text-xs font-medium text-gray-600 mb-2">Senior — Cognitive Support Level</label>
+          <label class="block text-xs font-medium text-gray-600 mb-2">Cognitive Support Level</label>
           <div class="flex flex-col gap-2">
-            <label class="card-label cursor-pointer">
-              <input class="card-radio" type="radio" name="cogLevel" value="standard" checked />
-              <div>
-                <div class="text-sm font-medium text-gray-800">Standard</div>
-                <div class="text-xs text-gray-500">Full cognition — normal conversation depth</div>
-              </div>
-            </label>
-            <label class="card-label cursor-pointer">
-              <input class="card-radio" type="radio" name="cogLevel" value="mild" />
-              <div>
-                <div class="text-sm font-medium text-gray-800">Gentle Support</div>
-                <div class="text-xs text-gray-500">May have mild memory concerns — extra patience, avoid information overload</div>
-              </div>
-            </label>
-            <label class="card-label cursor-pointer">
-              <input class="card-radio" type="radio" name="cogLevel" value="intensive" />
-              <div>
-                <div class="text-sm font-medium text-gray-800">Intensive Support</div>
-                <div class="text-xs text-gray-500">Significant cognitive needs — keep responses very short and simple</div>
-              </div>
-            </label>
+            <label class="card-label cursor-pointer"><input class="card-radio" type="radio" name="cogLevel" value="standard" checked /><div><div class="text-sm font-medium text-gray-800">Standard</div><div class="text-xs text-gray-500">Full cognition — normal conversation depth</div></div></label>
+            <label class="card-label cursor-pointer"><input class="card-radio" type="radio" name="cogLevel" value="mild" /><div><div class="text-sm font-medium text-gray-800">Gentle Support</div><div class="text-xs text-gray-500">Mild memory concerns — extra patience, avoid information overload</div></div></label>
+            <label class="card-label cursor-pointer"><input class="card-radio" type="radio" name="cogLevel" value="intensive" /><div><div class="text-sm font-medium text-gray-800">Intensive Support</div><div class="text-xs text-gray-500">Significant cognitive needs — keep responses very short and simple</div></div></label>
           </div>
         </div>
-
-        <!-- Languages -->
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-2">Language(s)</label>
           <div class="flex flex-wrap gap-2">
-            <input class="pill-input" type="checkbox" id="lang-en" name="lang" value="English" checked />
-            <label class="pill-label" for="lang-en">English</label>
-
-            <input class="pill-input" type="checkbox" id="lang-zh" name="lang" value="Mandarin" />
-            <label class="pill-label" for="lang-zh">普通话 Mandarin</label>
-
-            <input class="pill-input" type="checkbox" id="lang-yue" name="lang" value="Cantonese" />
-            <label class="pill-label" for="lang-yue">广东话 Cantonese</label>
-
-            <input class="pill-input" type="checkbox" id="lang-ms" name="lang" value="Malay" />
-            <label class="pill-label" for="lang-ms">Bahasa Melayu</label>
-
-            <input class="pill-input" type="checkbox" id="lang-ta" name="lang" value="Tamil" />
-            <label class="pill-label" for="lang-ta">தமிழ் Tamil</label>
-
-            <input class="pill-input" type="checkbox" id="lang-hk" name="lang" value="Hokkien" />
-            <label class="pill-label" for="lang-hk">福建話 Hokkien</label>
+            <input class="pill-input" type="checkbox" id="lang-en" name="lang" value="English" checked /><label class="pill-label" for="lang-en">English</label>
+            <input class="pill-input" type="checkbox" id="lang-zh" name="lang" value="Mandarin" /><label class="pill-label" for="lang-zh">普通话 Mandarin</label>
+            <input class="pill-input" type="checkbox" id="lang-yue" name="lang" value="Cantonese" /><label class="pill-label" for="lang-yue">广东话 Cantonese</label>
+            <input class="pill-input" type="checkbox" id="lang-ms" name="lang" value="Malay" /><label class="pill-label" for="lang-ms">Bahasa Melayu</label>
+            <input class="pill-input" type="checkbox" id="lang-ta" name="lang" value="Tamil" /><label class="pill-label" for="lang-ta">தமிழ் Tamil</label>
+            <input class="pill-input" type="checkbox" id="lang-hk" name="lang" value="Hokkien" /><label class="pill-label" for="lang-hk">福建話 Hokkien</label>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- ── C. TONE ─────────────────────────────────────────────────── -->
+    <!-- C. TONE -->
     <div class="bg-white rounded-2xl p-6 mb-5 border border-gray-100 shadow-sm">
       <h3 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
         <span class="w-5 h-5 rounded bg-amber-100 text-amber-700 text-[10px] font-bold flex items-center justify-center">C</span>
         Tone
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-
-        <label class="card-label cursor-pointer">
-          <input class="card-radio" type="radio" name="tone" value="Empathetic" />
-          <div>
-            <div class="text-sm font-medium text-gray-800">🤗 Empathetic</div>
-            <div class="text-xs text-gray-500">Warm, validating, emotionally attuned</div>
-          </div>
-        </label>
-
-        <label class="card-label cursor-pointer">
-          <input class="card-radio" type="radio" name="tone" value="Professional" />
-          <div>
-            <div class="text-sm font-medium text-gray-800">🎓 Professional</div>
-            <div class="text-xs text-gray-500">Knowledgeable, clear, trustworthy</div>
-          </div>
-        </label>
-
-        <label class="card-label cursor-pointer">
-          <input class="card-radio" type="radio" name="tone" value="Friendly" checked />
-          <div>
-            <div class="text-sm font-medium text-gray-800">😊 Friendly</div>
-            <div class="text-xs text-gray-500">Approachable, conversational, relaxed</div>
-          </div>
-        </label>
-
-        <label class="card-label cursor-pointer">
-          <input class="card-radio" type="radio" name="tone" value="Motivational" />
-          <div>
-            <div class="text-sm font-medium text-gray-800">💪 Motivational</div>
-            <div class="text-xs text-gray-500">Uplifting, encouraging, action-oriented</div>
-          </div>
-        </label>
-
+        <label class="card-label cursor-pointer"><input class="card-radio" type="radio" name="tone" value="Empathetic" /><div><div class="text-sm font-medium text-gray-800">🤗 Empathetic</div><div class="text-xs text-gray-500">Warm, validating, emotionally attuned</div></div></label>
+        <label class="card-label cursor-pointer"><input class="card-radio" type="radio" name="tone" value="Professional" /><div><div class="text-sm font-medium text-gray-800">🎓 Professional</div><div class="text-xs text-gray-500">Knowledgeable, clear, trustworthy</div></div></label>
+        <label class="card-label cursor-pointer"><input class="card-radio" type="radio" name="tone" value="Friendly" checked /><div><div class="text-sm font-medium text-gray-800">😊 Friendly</div><div class="text-xs text-gray-500">Approachable, conversational, relaxed</div></div></label>
+        <label class="card-label cursor-pointer"><input class="card-radio" type="radio" name="tone" value="Motivational" /><div><div class="text-sm font-medium text-gray-800">💪 Motivational</div><div class="text-xs text-gray-500">Uplifting, encouraging, action-oriented</div></div></label>
       </div>
     </div>
 
-    <!-- ── D. OCEAN PERSONALITY ────────────────────────────────────── -->
+    <!-- D. OCEAN -->
     <div class="bg-white rounded-2xl p-6 mb-5 border border-gray-100 shadow-sm">
       <h3 class="text-sm font-semibold text-gray-800 mb-1 flex items-center gap-2">
         <span class="w-5 h-5 rounded bg-purple-100 text-purple-700 text-[10px] font-bold flex items-center justify-center">D</span>
@@ -400,313 +281,121 @@
       <div id="oceanSliders" class="space-y-6"></div>
     </div>
 
-    <!-- ── E. CORE PURPOSE & LIMITS ───────────────────────────────── -->
+    <!-- E. CORE PURPOSE -->
     <div class="bg-white rounded-2xl p-6 mb-5 border border-gray-100 shadow-sm">
       <h3 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
         <span class="w-5 h-5 rounded bg-rose-100 text-rose-700 text-[10px] font-bold flex items-center justify-center">E</span>
         Core Purpose & Limits
       </h3>
       <div class="space-y-4">
-
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Primary Goals <span class="text-red-400">*</span></label>
-          <textarea id="primaryGoals" rows="3"
-            placeholder="What should this persona help seniors achieve? e.g., Provide accessible TCM wellness guidance, explain herbal food therapy in everyday language, encourage lifestyle habits aligned with TCM principles…"
+          <textarea id="primaryGoals" rows="3" placeholder="What should this persona help seniors achieve? e.g., Provide accessible TCM wellness guidance, explain herbal food therapy in everyday language, encourage lifestyle habits aligned with TCM principles…"
             class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition resize-none"></textarea>
         </div>
-
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Hard Limits / What to Avoid</label>
-          <textarea id="hardLimits" rows="2"
-            placeholder="e.g., Never diagnose medical conditions, never recommend stopping prescribed medication, never claim treatments can cure serious diseases…"
+          <textarea id="hardLimits" rows="2" placeholder="e.g., Never diagnose medical conditions, never recommend stopping prescribed medication…"
             class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition resize-none"></textarea>
         </div>
-
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-2">Emergency Protocol</label>
           <div class="flex flex-col gap-2">
-
-            <label class="card-label cursor-pointer">
-              <input class="card-radio" type="radio" name="emergency" value="staff" />
-              <span class="text-sm text-gray-700">Direct senior to press call button / speak to staff immediately</span>
-            </label>
-
-            <label class="card-label cursor-pointer">
-              <input class="card-radio" type="radio" name="emergency" value="hotline" />
-              <span class="text-sm text-gray-700">Provide emergency hotline (995 / 1800-202-6868)</span>
-            </label>
-
-            <label class="card-label cursor-pointer">
-              <input class="card-radio" type="radio" name="emergency" value="both" checked />
-              <span class="text-sm text-gray-700">Both — direct to staff AND provide hotline</span>
-            </label>
-
+            <label class="card-label cursor-pointer"><input class="card-radio" type="radio" name="emergency" value="staff" /><span class="text-sm text-gray-700">Direct senior to press call button / speak to staff immediately</span></label>
+            <label class="card-label cursor-pointer"><input class="card-radio" type="radio" name="emergency" value="hotline" /><span class="text-sm text-gray-700">Provide emergency hotline (995 / 1800-202-6868)</span></label>
+            <label class="card-label cursor-pointer"><input class="card-radio" type="radio" name="emergency" value="both" checked /><span class="text-sm text-gray-700">Both — direct to staff AND provide hotline</span></label>
           </div>
         </div>
-
       </div>
     </div>
 
     <div class="flex justify-end mt-2">
       <button onclick="goToRound2()"
         class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-semibold px-7 py-3 rounded-xl text-sm transition shadow-md flex items-center gap-2">
-        Continue to Refinement
+        Analyse &amp; Continue
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
         </svg>
       </button>
     </div>
-
   </div><!-- /round1 -->
 
-
-  <!-- ══════════════════════════════════════════════════════════════════
-       ROUND 2 — REFINEMENT (dynamically rendered)
-  ══════════════════════════════════════════════════════════════════ -->
+  <!-- ROUND 2 -->
   <div id="round2" class="hidden"></div>
 
-
-  <!-- ══════════════════════════════════════════════════════════════════
-       ROUND 3 — OUTPUT (dynamically rendered)
-  ══════════════════════════════════════════════════════════════════ -->
+  <!-- ROUND 3 -->
   <div id="round3" class="hidden"></div>
 
 </main>
 
-<!-- Toast container -->
-<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none"></div>
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col items-center gap-2"></div>
 
-<!-- ─── SCRIPT ─────────────────────────────────────────────────────── -->
+<!-- ─── SCRIPT ───────────────────────────────────────────────────────── -->
 <script>
-/* ─────────────────────────────────────────────────────────────────────
-   STATE
-───────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════
+   CONSTANTS & STATE
+═══════════════════════════════════════════════════════════════════════ */
+const DEEPSEEK_ENDPOINT = 'https://api.deepseek.com/v1/chat/completions';
+const DEEPSEEK_MODEL    = 'deepseek-chat';
+
 const state = {
-  ocean: { O: 7, C: 6, E: 5, A: 8, N: 3 },
+  ocean: { O:7, C:6, E:5, A:8, N:3 },
   r1: {},
-  r2: {}
+  r2: {},
+  aiQuestions:     [],   // AI-generated Round 2 questions
+  intentAnalysis:  '',   // AI intent summary shown in Round 2
+  aiPrompt:        '',   // AI-generated system prompt (Round 3)
+  aiKB:            []    // AI-generated KB recs with keywords (Round 3)
 };
 
-/* ─────────────────────────────────────────────────────────────────────
-   OCEAN DEFINITIONS
-───────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════
+   DEFINITIONS
+═══════════════════════════════════════════════════════════════════════ */
 const oceanDefs = [
-  { key:'O', label:'Openness',            emoji:'🔭', lo:'Conventional',         hi:'Curious & Creative',      loDesc:'Prefers tried-and-true, familiar approaches', hiDesc:'Loves exploring ideas, creative and imaginative' },
-  { key:'C', label:'Conscientiousness',   emoji:'📋', lo:'Flexible & Spontaneous',hi:'Organised & Methodical',  loDesc:'Relaxed, goes with the flow, adaptable',       hiDesc:'Structured, thorough, detail-oriented' },
-  { key:'E', label:'Extraversion',        emoji:'🗣️', lo:'Reserved & Reflective', hi:'Outgoing & Energetic',    loDesc:'Calm, listens deeply, speaks thoughtfully',    hiDesc:'Enthusiastic, talkative, warm and expressive' },
-  { key:'A', label:'Agreeableness',       emoji:'🤝', lo:'Direct & Analytical',   hi:'Cooperative & Empathetic',loDesc:'Objective, honest, straightforward',           hiDesc:'Warm, supportive, deeply people-focused' },
-  { key:'N', label:'Emotional Stability', emoji:'⚖️', lo:'Very Stable',           hi:'Emotionally Responsive',  loDesc:'Calm, consistent, unflappable',                hiDesc:'Sensitive, emotionally attuned, reactive' }
+  { key:'O', label:'Openness',           emoji:'🔭', lo:'Conventional',          hi:'Curious & Creative',      loDesc:'Prefers tried-and-true, familiar approaches', hiDesc:'Loves exploring ideas, creative and imaginative' },
+  { key:'C', label:'Conscientiousness',  emoji:'📋', lo:'Flexible & Spontaneous', hi:'Organised & Methodical',  loDesc:'Relaxed, goes with the flow, adaptable',       hiDesc:'Structured, thorough, detail-oriented' },
+  { key:'E', label:'Extraversion',       emoji:'🗣️', lo:'Reserved & Reflective',  hi:'Outgoing & Energetic',    loDesc:'Calm, listens deeply, speaks thoughtfully',    hiDesc:'Enthusiastic, talkative, warm and expressive' },
+  { key:'A', label:'Agreeableness',      emoji:'🤝', lo:'Direct & Analytical',    hi:'Cooperative & Empathetic',loDesc:'Objective, honest, straightforward',           hiDesc:'Warm, supportive, deeply people-focused' },
+  { key:'N', label:'Emotional Stability',emoji:'⚖️', lo:'Very Stable',            hi:'Emotionally Responsive',  loDesc:'Calm, consistent, unflappable',                hiDesc:'Sensitive, emotionally attuned, reactive' }
 ];
 
-/* ─────────────────────────────────────────────────────────────────────
-   ROLE DEFINITIONS
-───────────────────────────────────────────────────────────────────── */
 const ROLES = {
-  tcm:          { label:'TCM Advisor',              emoji:'🌿' },
-  nutritionist: { label:'Nutritionist',             emoji:'🥗' },
-  fitness:      { label:'Fitness & Movement Coach', emoji:'🏃' },
-  carpentry:    { label:'Carpentry & Woodcraft',     emoji:'🪚' },
-  music_therapy:{ label:'Music Therapist',           emoji:'🎵' },
-  art_therapy:  { label:'Art & Creative Therapist',  emoji:'🎨' },
-  counsellor:   { label:'Life Counsellor',           emoji:'💬' },
-  tech_helper:  { label:'Tech Helper',               emoji:'💻' },
-  gardening:    { label:'Horticultural Therapist',   emoji:'🌱' },
-  custom:       { label:'Custom',                    emoji:'⚙️'  }
+  tcm:'TCM Advisor', nutritionist:'Nutritionist', fitness:'Fitness & Movement Coach',
+  carpentry:'Carpentry & Woodcraft', music_therapy:'Music Therapist',
+  art_therapy:'Art & Creative Therapist', counsellor:'Life Counsellor',
+  tech_helper:'Tech Helper', gardening:'Horticultural Therapist', custom:'Custom'
 };
-function roleName(k) { return ROLES[k]?.label || 'Persona'; }
-function roleEmoji(k){ return ROLES[k]?.emoji || '🤖'; }
-
-/* ─────────────────────────────────────────────────────────────────────
-   ROUND 2 QUESTIONS PER ROLE
-───────────────────────────────────────────────────────────────────── */
-const roleQuestions = {
-  tcm: [
-    { type:'checkbox', q:'Which TCM modalities should this persona be expert in?',
-      opts:['Herbal medicine & food therapy (食疗)','Acupressure & meridian concepts','Qigong & Tai Chi guidance','Dietary therapy by constitution','Seasonal wellness practices','Five Elements (五行) theory','Cupping & Moxibustion awareness'] },
-    { type:'radio', q:'When recommending herbs, the persona should:',
-      opts:['Provide educational info on herb names and general uses','Only discuss food-grade herbs (goji, red dates, ginger, etc.)','Describe TCM principles only — no specific herb names','Always recommend consulting a licensed TCM physician first'] },
-    { type:'radio', q:'When TCM and Western medicine seem to conflict, the persona should:',
-      opts:['Present both perspectives neutrally and encourage consulting both physicians','Gently favour TCM while acknowledging the value of Western medicine','Strictly defer to prescribed medication and encourage doctor consultation','Explain TCM perspective, but never suggest stopping any medication'] },
-    { type:'checkbox', q:'Key senior health areas for this persona to address:',
-      opts:['Joint pain & arthritis','Sleep difficulties','Digestive health','Blood pressure & circulation','Energy & chronic fatigue','Emotional wellbeing','Memory & cognitive health','Appetite & nutrition','Skin & ageing'] }
-  ],
-  nutritionist: [
-    { type:'checkbox', q:'Which dietary frameworks should this persona understand?',
-      opts:['Diabetic-friendly / low glycaemic','Low sodium (heart & kidney health)','Soft / minced foods (dysphagia)','Vegetarian / vegan','Halal','Buddhist vegetarian','High-protein for muscle retention','Mediterranean diet','Renal diet'] },
-    { type:'radio', q:'Should the persona address medication–food interactions?',
-      opts:['Yes — flag common interactions (e.g., warfarin & leafy greens)','Mention it may be relevant but always defer to pharmacist/doctor','No — focus on general healthy eating only'] },
-    { type:'checkbox', q:'Relevant cooking context for your seniors:',
-      opts:['Seniors cook for themselves','Family members cook for seniors','Facility prepares all meals','Seniors have limited kitchen mobility','Budget-conscious meal planning','Guidance for hawker / outside food'] }
-  ],
-  fitness: [
-    { type:'checkbox', q:'Types of physical activities to include:',
-      opts:['Chair-based exercises','Walking programmes','Balance & fall prevention','Light strength training','Stretching & flexibility','Tai Chi & Qigong','Breathing exercises','Water aerobics','Dance & movement therapy'] },
-    { type:'radio', q:'Safety emphasis level:',
-      opts:['Maximum safety — always suggest medical clearance before any exercise','Balanced — motivational but weave in safety tips','Motivational first — encourage activity, mention safety where critical'] },
-    { type:'checkbox', q:'Physical limitations to accommodate:',
-      opts:['Wheelchair users','Post-surgery recovery','Osteoporosis','Parkinson\'s disease','Post-stroke rehabilitation','COPD / breathlessness','Severe arthritis / limited grip'] }
-  ],
-  carpentry: [
-    { type:'checkbox', q:'Types of woodcraft projects to focus on:',
-      opts:['Simple decorative items','Practical home repairs','Traditional Asian joinery','Garden furniture','Upcycling & recycling projects','Miniature / model building','Painting, staining & finishing','Tool maintenance'] },
-    { type:'radio', q:'Tool complexity level:',
-      opts:['Hand tools only — no power tools for safety','Light power tools are okay (drills, sanders) with guidance','Full tool range with clear safety protocols','Adapt recommendations to each senior\'s stated ability'] }
-  ],
-  music_therapy: [
-    { type:'checkbox', q:'Music therapy approaches to include:',
-      opts:['Singing & vocal exercises','Simple percussion instruments','Music listening & reminiscence','Rhythm exercises for coordination','Song-writing & lyric creation','Traditional / folk music (local heritage)','Relaxation & guided imagery','Drumming circles'] },
-    { type:'radio', q:'Assumed musical background for most seniors:',
-      opts:['No musical training — keep everything accessible','Mix of backgrounds — adapt as needed','Many likely have folk / traditional music experience'] }
-  ],
-  art_therapy: [
-    { type:'checkbox', q:'Art therapy modalities to cover:',
-      opts:['Drawing & sketching','Watercolour painting','Collage & scrapbooking','Clay & sculpting','Batik & fabric art','Chinese brush painting','Colouring (mindfulness)','Photography','Digital art (simple apps)'] },
-    { type:'radio', q:'Therapeutic goal emphasis:',
-      opts:['Expression & emotional processing','Cognitive stimulation & fine motor skills','Social bonding & sharing','Cultural connection & reminiscence','General enjoyment — no specific therapeutic goal'] }
-  ],
-  counsellor: [
-    { type:'checkbox', q:'Key topics this counsellor should address:',
-      opts:['Loneliness & social isolation','Grief & loss of loved ones','Family relationship challenges','Retirement adjustment','Purpose & meaning in later life','Anxiety & worry','Life review & reminiscence','Intergenerational relationships','Fear of declining health'] },
-    { type:'radio', q:'Primary counselling approach:',
-      opts:['Empathetic listening — focus on validation and emotional support','Solution-focused — help find practical coping strategies','Strengths-based — affirm the senior\'s wisdom and resilience','Flexible mix depending on what the senior needs'] },
-    { type:'radio', q:'When a senior expresses severe distress or suicidal ideation:',
-      opts:['Listen with care, then immediately guide them to speak to staff','Provide the crisis hotline (1800-202-6868) immediately','Acknowledge their pain deeply, then offer both staff referral and hotline'] }
-  ],
-  tech_helper: [
-    { type:'checkbox', q:'Technology areas to assist with:',
-      opts:['Smartphones (calls, WhatsApp, photos)','Video calling (Zoom, FaceTime)','Government digital services (Singpass, HealthHub)','Online banking basics','Social media (Facebook, YouTube)','Online shopping safety','Scam awareness & prevention','iPad & tablet basics','Email basics'] },
-    { type:'radio', q:'Preferred teaching style:',
-      opts:['Step-by-step verbal instructions, very detailed','Ask the senior to describe what they see on screen first','Short numbered steps — maximum 3 actions at a time','Explain the concept first, then give the steps'] }
-  ],
-  gardening: [
-    { type:'checkbox', q:'Gardening areas to focus on:',
-      opts:['Container & pot gardening','Edible herbs & vegetables (e.g., pandan, kaffir lime)','Tropical flowers & ornamental plants','Indoor & balcony plants','Community garden programme activities','Adapted gardening for limited mobility','Therapeutic horticulture activities','Composting & sustainability'] }
-  ],
-  custom: []
+const ROLE_EMOJIS = {
+  tcm:'🌿', nutritionist:'🥗', fitness:'🏃', carpentry:'🪚',
+  music_therapy:'🎵', art_therapy:'🎨', counsellor:'💬',
+  tech_helper:'💻', gardening:'🌱', custom:'⚙️'
 };
 
-/* Universal follow-up questions (always appended) */
-const universalQuestions = [
-  { type:'radio', q:'How should [Name] open each conversation?',
-    opts:['Warm greeting, then ask how the senior is feeling today','Introduce itself and ask what the senior needs help with','Share a cheerful tip or thought for the day, then ask how to help','Go directly to business — seniors prefer no small talk'] },
-  { type:'checkbox', q:'Sensitive topics this persona may encounter:',
-    opts:['Grief & loss','End-of-life conversations','Loneliness & isolation','Family conflict','Financial worry','Fear of declining health','Loss of independence','Chronic pain & suffering'] },
-  { type:'textarea', q:'Describe [Name]\'s "voice" in 2–3 sentences. Signature phrases? Mannerisms?',
-    ph:'e.g., Zhen speaks like a wise elder sharing tea with you. She often says "as the old masters teach us…" and uses seasonal metaphors. She never rushes and always ends with an encouragement.' },
-  { type:'radio', q:'Proactive engagement style:',
-    opts:['Proactively suggest tips, activities, and check-ins','Wait for the senior to ask — respect their autonomy','Gentle suggestions when the senior seems uncertain or quiet','Mirror the senior\'s energy and follow their lead'] },
-  { type:'textarea', q:'Cultural context: What beliefs, customs, or sensitivities should [Name] be aware of?',
-    ph:'e.g., Many seniors hold traditional beliefs — feng shui, auspicious dates, dietary taboos. Respect these without judgment. Some may reference folk remedies or ancestral practices.' }
-];
+function roleName(k)  { return ROLES[k] || 'Persona'; }
+function roleEmoji(k) { return ROLE_EMOJIS[k] || '🤖'; }
 
-/* ─────────────────────────────────────────────────────────────────────
-   KNOWLEDGE BASE RECOMMENDATIONS
-───────────────────────────────────────────────────────────────────── */
-const kbRole = {
-  tcm:[
-    { title:'TCM Fundamentals for Elderly Wellness',        pages:'~80pp',  desc:'Core concepts: Qi, Yin-Yang, Five Elements, meridians — in accessible language.' },
-    { title:'Herbal & Food Therapy Guide (Senior-Safe)',     pages:'~120pp', desc:'Herb safety profiles, food-as-medicine principles, remedies for common senior ailments.' },
-    { title:'TCM Seasonal Wellness Protocols',              pages:'~40pp',  desc:'Seasonal lifestyle and dietary adjustments according to TCM principles.' },
-    { title:'Tai Chi & Qigong for Seniors — Illustrated',   pages:'~60pp',  desc:'Gentle exercises with safety notes for older adults.' },
-    { title:'Drug-Herb Interaction Reference (Senior-Safe)', pages:'~30pp',  desc:'Common interactions between TCM herbs and medications taken by seniors.' },
-    { title:'FAQ: TCM Questions Seniors Ask',               pages:'~20pp',  desc:'Curated Q&A from real questions seniors ask about TCM in care settings.' }
-  ],
-  nutritionist:[
-    { title:'Nutrition Guidelines for Older Adults (MOH SG)',         pages:'~50pp', desc:'Singapore MOH evidence-based dietary guidelines for seniors.' },
-    { title:'Managing Chronic Conditions Through Diet',               pages:'~90pp', desc:'Dietary guidance for diabetes, hypertension, kidney disease, and heart disease.' },
-    { title:'Soft & Minced Food Cookbook for Seniors',                pages:'~70pp', desc:'Recipes and prep tips for seniors with swallowing difficulties.' },
-    { title:'Hawker Food Nutrition Guide',                            pages:'~40pp', desc:'Healthier choices and nutritional profiles for local hawker foods.' },
-    { title:'Malnutrition Prevention in Elderly',                     pages:'~35pp', desc:'Warning signs and strategies to prevent undernourishment.' }
-  ],
-  fitness:[
-    { title:'WHO Physical Activity Guidelines — Senior Adaptations',  pages:'~60pp', desc:'Evidence-based exercise guidelines adapted for older adults.' },
-    { title:'Fall Prevention Exercise Programme',                     pages:'~45pp', desc:'Structured balance and strength exercises to reduce fall risk.' },
-    { title:'Chair-Based Exercises for Frail Elderly',               pages:'~40pp', desc:'Illustrated seated routines for low-mobility seniors.' },
-    { title:'Post-Surgical Rehabilitation Guidelines (Hip/Knee)',     pages:'~55pp', desc:'Safe exercise progressions after common senior surgeries.' }
-  ],
-  carpentry:[
-    { title:'Woodworking Safety for Older Adults',              pages:'~30pp', desc:'Ergonomic tools, adapted safety protocols, and workspace setup.' },
-    { title:'Simple Woodcraft Projects — Step-by-Step',        pages:'~80pp', desc:'20+ beginner-friendly projects with illustrated instructions.' },
-    { title:'Traditional Asian Joinery Techniques',            pages:'~50pp', desc:'Cultural connection through traditional joinery craftsmanship.' },
-    { title:'Adaptive Tools for Limited Dexterity',            pages:'~25pp', desc:'Recommended tools and jigs for seniors with reduced grip or arthritis.' }
-  ],
-  music_therapy:[
-    { title:'Music Therapy & Dementia: Evidence & Practice',       pages:'~70pp', desc:'Research-backed music therapy approaches for cognitive health.' },
-    { title:'Singapore Folk Songs & Nostalgic Music Compendium',   pages:'~60pp', desc:'Lyrics and background of popular songs across generations and communities.' },
-    { title:'Rhythm & Movement Activities for Older Adults',       pages:'~40pp', desc:'Simple percussion activities and chair-based movement to music.' }
-  ],
-  art_therapy:[
-    { title:'Art Therapy for Older Adults: Clinical Guide',    pages:'~80pp', desc:'Therapeutic art activities, facilitation tips, and evidence base.' },
-    { title:'Watercolour Techniques for Beginners',            pages:'~55pp', desc:'Step-by-step guide to watercolour painting with minimal supplies.' },
-    { title:'Chinese Brush Painting Fundamentals',             pages:'~45pp', desc:'Traditional brush painting techniques with cultural context.' }
-  ],
-  counsellor:[
-    { title:'Counselling Older Adults: A Practical Guide',                    pages:'~90pp', desc:'Therapeutic approaches for seniors — grief, purpose, identity.' },
-    { title:'Active Ageing & Psychological Wellbeing',                        pages:'~60pp', desc:'Positive ageing frameworks, resilience, and mental health in later life.' },
-    { title:'Crisis Intervention Protocol for Seniors',                       pages:'~30pp', desc:'Responding to suicidal ideation, acute grief, and psychiatric crises.' },
-    { title:'Cultural Considerations in Senior Counselling (Singapore)',       pages:'~40pp', desc:'Multicultural competency guide for diverse elderly populations.' }
-  ],
-  tech_helper:[
-    { title:'Digital Literacy for Seniors (IMDA Guide)',             pages:'~70pp', desc:'IMDA-aligned digital skills curriculum for older adults.' },
-    { title:'Scam Awareness & Prevention for Seniors',               pages:'~40pp', desc:'Common scam types, red flags, and protective strategies.' },
-    { title:'Singpass & HealthHub Guide for Seniors',                pages:'~35pp', desc:'Step-by-step guide to key Singapore government digital services.' },
-    { title:'WhatsApp & Video Calling (Large Print Edition)',         pages:'~30pp', desc:'Large-text guide to messaging and video calling apps.' }
-  ],
-  gardening:[
-    { title:'Therapeutic Horticulture for Older Adults',      pages:'~65pp', desc:'Evidence-based gardening therapy principles and activity ideas.' },
-    { title:'Tropical Container Gardening (Singapore)',       pages:'~50pp', desc:'Growing vegetables and herbs in pots — adapted for Singapore climate.' },
-    { title:'Adaptive Gardening for Limited Mobility',        pages:'~40pp', desc:'Raised beds, ergonomic tools, and techniques for mobility-limited seniors.' }
-  ],
-  custom:[
-    { title:'[Role] Reference Manual & Best Practices',         pages:'varies', desc:'Core domain reference guide for this persona\'s area of expertise.' },
-    { title:'Senior-Specific Guidelines for [Role Domain]',     pages:'varies', desc:'Adaptations when applying this expertise with older adults.' },
-    { title:'FAQ — [Role Domain] for Seniors',                  pages:'varies', desc:'Common questions and answers relevant to senior users in this domain.' },
-    { title:'Safety Protocols for [Role Domain]',               pages:'varies', desc:'Emergency procedures and safety guidelines for this activity.' }
-  ]
-};
-
-const kbUniversal = [
-  { title:'Senior Care Communication Guide',                pages:'~25pp', desc:'Best practices for communicating with elderly — clarity, pacing, non-verbal cues.' },
-  { title:'Dementia Awareness & Communication Tips',        pages:'~30pp', desc:'Effectively communicating with seniors experiencing cognitive decline.' },
-  { title:'Singapore Senior Support Services Directory',    pages:'~20pp', desc:'Key hotlines, community resources, and referral pathways for seniors.' }
-];
-
-/* ─────────────────────────────────────────────────────────────────────
-   INIT OCEAN SLIDERS
-───────────────────────────────────────────────────────────────────── */
-function initOcean() {
-  const wrap = document.getElementById('oceanSliders');
-  wrap.innerHTML = oceanDefs.map(d => `
-    <div>
-      <div class="flex items-center justify-between mb-1.5">
-        <div class="flex items-center gap-1.5">
-          <span>${d.emoji}</span>
-          <span class="text-sm font-medium text-gray-800">${d.label}</span>
-        </div>
-        <span id="oval-${d.key}" class="text-sm font-bold text-indigo-600 w-5 text-right">${state.ocean[d.key]}</span>
-      </div>
-      <input type="range" min="1" max="10" value="${state.ocean[d.key]}"
-        class="ocean-range w-full"
-        id="oslider-${d.key}"
-        oninput="onOcean('${d.key}', this)"
-        style="${sliderGrad(state.ocean[d.key])}" />
-      <div class="flex justify-between mt-1">
-        <div>
-          <div class="text-[11px] font-medium text-gray-500">${d.lo}</div>
-          <div class="text-[10px] text-gray-400 max-w-[130px]">${d.loDesc}</div>
-        </div>
-        <div class="text-right">
-          <div class="text-[11px] font-medium text-gray-500">${d.hi}</div>
-          <div class="text-[10px] text-gray-400 max-w-[130px]">${d.hiDesc}</div>
-        </div>
-      </div>
-    </div>
-  `).join('');
+/* ═══════════════════════════════════════════════════════════════════════
+   OCEAN SLIDER INIT
+═══════════════════════════════════════════════════════════════════════ */
+function sliderGrad(v) {
+  const p = (v-1)/9*100;
+  return `background:linear-gradient(to right,#4f46e5 ${p}%,#e5e7eb ${p}%)`;
 }
 
-function sliderGrad(v) {
-  const pct = (v-1)/9*100;
-  return `background: linear-gradient(to right, #4f46e5 ${pct}%, #e5e7eb ${pct}%)`;
+function initOcean() {
+  document.getElementById('oceanSliders').innerHTML = oceanDefs.map(d=>`
+    <div>
+      <div class="flex items-center justify-between mb-1.5">
+        <div class="flex items-center gap-1.5"><span>${d.emoji}</span><span class="text-sm font-medium text-gray-800">${d.label}</span></div>
+        <span id="oval-${d.key}" class="text-sm font-bold text-indigo-600 w-5 text-right">${state.ocean[d.key]}</span>
+      </div>
+      <input type="range" min="1" max="10" value="${state.ocean[d.key]}" class="ocean-range w-full"
+        id="oslider-${d.key}" oninput="onOcean('${d.key}',this)" style="${sliderGrad(state.ocean[d.key])}" />
+      <div class="flex justify-between mt-1">
+        <div><div class="text-[11px] font-medium text-gray-500">${d.lo}</div><div class="text-[10px] text-gray-400 max-w-[130px]">${d.loDesc}</div></div>
+        <div class="text-right"><div class="text-[11px] font-medium text-gray-500">${d.hi}</div><div class="text-[10px] text-gray-400 max-w-[130px]">${d.hiDesc}</div></div>
+      </div>
+    </div>`).join('');
 }
 
 function onOcean(key, el) {
@@ -715,25 +404,58 @@ function onOcean(key, el) {
   el.style = sliderGrad(+el.value);
 }
 
-/* ─────────────────────────────────────────────────────────────────────
-   SHOW / HIDE SENIOR OPTS
-───────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════
+   DOM EVENT LISTENERS
+═══════════════════════════════════════════════════════════════════════ */
 document.querySelectorAll('[name="audience"]').forEach(r =>
-  r.addEventListener('change', () => {
-    document.getElementById('seniorOpts').classList.toggle('hidden', r.value !== 'Senior' || !r.checked);
-  })
+  r.addEventListener('change', () =>
+    document.getElementById('seniorOpts').classList.toggle('hidden', r.value!=='Senior' || !r.checked)
+  )
 );
 
-/* ─────────────────────────────────────────────────────────────────────
-   SHOW / HIDE CUSTOM ROLE INPUT
-───────────────────────────────────────────────────────────────────── */
 document.getElementById('roleSelect').addEventListener('change', function() {
-  document.getElementById('customRoleWrap').classList.toggle('hidden', this.value !== 'custom');
+  document.getElementById('customRoleWrap').classList.toggle('hidden', this.value!=='custom');
 });
 
-/* ─────────────────────────────────────────────────────────────────────
-   COLLECT ROUND 1
-───────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════
+   DEEPSEEK API
+═══════════════════════════════════════════════════════════════════════ */
+async function callDeepSeek(messages, maxTokens = 3500) {
+  const key = window.DEEPSEEK_KEY;
+  if (!key || key === 'YOUR_DEEPSEEK_API_KEY_HERE') throw new Error('DeepSeek API key not configured');
+
+  const res = await fetch(DEEPSEEK_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${key}` },
+    body: JSON.stringify({ model:DEEPSEEK_MODEL, messages, temperature:0.7, max_tokens:maxTokens })
+  });
+
+  if (!res.ok) {
+    const e = await res.json().catch(()=>({}));
+    throw new Error(e.error?.message || `HTTP ${res.status}`);
+  }
+  const data = await res.json();
+  return data.choices[0].message.content;
+}
+
+function extractJSON(text) {
+  // Strip markdown code fences if present
+  const s = text.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'').trim();
+  return JSON.parse(s);
+}
+
+function setAIStatus(state) {
+  const dot   = document.getElementById('aiStatusDot');
+  const label = document.getElementById('aiStatusLabel');
+  if (!dot) return;
+  if (state==='active')  { dot.className='w-2 h-2 rounded-full bg-emerald-400 animate-pulse'; label.textContent='DeepSeek active'; }
+  if (state==='idle')    { dot.className='w-2 h-2 rounded-full bg-gray-300'; label.textContent='DeepSeek'; }
+  if (state==='error')   { dot.className='w-2 h-2 rounded-full bg-red-400'; label.textContent='DeepSeek (fallback)'; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ROUND 1 — COLLECT & NAVIGATE
+═══════════════════════════════════════════════════════════════════════ */
 function collectR1() {
   const langs = [...document.querySelectorAll('[name="lang"]:checked')].map(e=>e.value);
   const role  = document.getElementById('roleSelect').value;
@@ -756,68 +478,190 @@ function collectR1() {
   };
 }
 
-/* ─────────────────────────────────────────────────────────────────────
-   ROUND 1 → ROUND 2
-───────────────────────────────────────────────────────────────────── */
-function goToRound2() {
+async function goToRound2() {
   if (!document.getElementById('charName').value.trim()) { toast('Please enter a Character Name.'); return; }
-  if (!document.getElementById('roleSelect').value)      { toast('Please select a Role.'); return; }
+  if (!document.getElementById('roleSelect').value)       { toast('Please select a Role.'); return; }
   if (!document.getElementById('primaryGoals').value.trim()) { toast('Please describe the Primary Goals.'); return; }
 
   collectR1();
-  renderRound2();
   switchPanel('round2');
   activateStep(2);
+
+  // Show loading
+  document.getElementById('round2').innerHTML = loadingHTML(
+    'Analysing persona intent with DeepSeek AI…',
+    ['Understanding your design goals…','Identifying edge cases for seniors…','Crafting contextual questions…','Almost ready…'],
+    'Generating targeted follow-up questions'
+  );
+
+  try {
+    setAIStatus('active');
+    const raw  = await callDeepSeek(buildR2Messages());
+    const data = extractJSON(raw);
+    state.intentAnalysis = data.intentAnalysis || '';
+    state.aiQuestions    = normalizeQuestions(data.questions || []);
+    setAIStatus('idle');
+    renderRound2();
+  } catch(err) {
+    console.error('DeepSeek Round 2 error:', err);
+    setAIStatus('error');
+    toast('DeepSeek unavailable — using built-in questions', 'warn');
+    state.intentAnalysis = '';
+    state.aiQuestions    = getFallbackQuestions();
+    renderRound2();
+  }
 }
 
-/* ─────────────────────────────────────────────────────────────────────
-   RENDER ROUND 2
-───────────────────────────────────────────────────────────────────── */
+/* Build the DeepSeek prompt for Round 2 */
+function buildR2Messages() {
+  const r1 = state.r1;
+  const displayRole = r1.role==='custom' ? r1.customRole : roleName(r1.role);
+  const O=r1.ocean.O, C=r1.ocean.C, E=r1.ocean.E, A=r1.ocean.A, N=r1.ocean.N;
+
+  const personaSummary = `
+Name: ${r1.charName}
+Role: ${displayRole} | Expertise: ${r1.expertise}
+Description: ${r1.shortDesc}
+Unique Quality: ${r1.uniqueness || 'Not specified'}
+Target Audience: ${r1.audience}${r1.audience==='Senior' ? ` (Cognitive support level: ${r1.cogLevel})` : ''}
+Tone: ${r1.tone}
+Languages: ${r1.languages.join(', ')}
+Primary Goals: ${r1.primaryGoals}
+Hard Limits: ${r1.hardLimits || 'Not specified'}
+OCEAN Personality:
+  - Openness: ${O}/10 (${O>=7?'High — curious & exploratory':O<=3?'Low — conventional & reliable':'Balanced'})
+  - Conscientiousness: ${C}/10 (${C>=7?'High — organised & methodical':C<=3?'Low — flexible & spontaneous':'Balanced'})
+  - Extraversion: ${E}/10 (${E>=7?'High — outgoing & expressive':E<=3?'Low — reserved & reflective':'Balanced'})
+  - Agreeableness: ${A}/10 (${A>=7?'High — empathetic & cooperative':A<=3?'Low — direct & analytical':'Balanced'})
+  - Emotional Stability: ${N}/10 (${N>=7?'High — emotionally responsive & sensitive':N<=3?'Low — very stable & unflappable':'Balanced'})
+`.trim();
+
+  return [
+    {
+      role: 'system',
+      content: `You are an expert AI persona designer specialising in senior care technology in Singapore. You deeply understand elderly care, cultural nuances of multicultural Asian seniors, and best practices for conversational AI. Your job is to analyse a persona configuration and generate highly targeted, insightful follow-up questions that will make the persona more robust, safe, and effective.`
+    },
+    {
+      role: 'user',
+      content: `Analyse this AI persona configuration and produce:
+1. A concise "intentAnalysis" (2–3 sentences) identifying the persona's core purpose, what makes it effective, and the most important design considerations for this specific role with seniors.
+2. Exactly 8 targeted follow-up questions to deepen and refine the persona.
+
+PERSONA CONFIGURATION:
+${personaSummary}
+
+REQUIREMENTS FOR QUESTIONS:
+- Reference the persona's name and role specifically — make questions feel personalised, not generic
+- Mix question types: 3 radio (single choice), 3 checkbox (multi-select), 2 textarea (open-ended)
+- Cover a diverse range of: domain-specific knowledge boundaries, cultural and linguistic nuances, edge cases specific to seniors (cognitive decline, loneliness, health fears), safety and escalation, personality expression, conversation flow
+- Options for radio/checkbox should be specific and realistic for this role
+- Textarea questions should prompt thoughtful, concrete answers
+- Each question should have a "rationale" (≤15 words) explaining why it matters
+
+Return ONLY valid JSON (no markdown, no explanation) in this exact schema:
+{
+  "intentAnalysis": "string",
+  "questions": [
+    {
+      "question": "string",
+      "type": "radio" | "checkbox" | "textarea",
+      "options": ["string", ...] or null,
+      "placeholder": "string or null",
+      "rationale": "string"
+    }
+  ]
+}`
+    }
+  ];
+}
+
+/* Normalise AI question format to internal format */
+function normalizeQuestions(qs) {
+  return qs.map(q => ({
+    q: q.question || q.q || '',
+    type: q.type || 'textarea',
+    opts: q.options || q.opts || null,
+    ph: q.placeholder || q.ph || '',
+    rationale: q.rationale || ''
+  }));
+}
+
+/* Fallback questions if API fails */
+function getFallbackQuestions() {
+  return normalizeQuestions([
+    { question:'How should this persona open each conversation?', type:'radio',
+      options:['Warm greeting + ask how the senior is feeling','Introduce itself then ask what the senior needs','Share a friendly tip, then ask how to help','Go straight to business'] },
+    { question:'What sensitive topics might this persona encounter?', type:'checkbox',
+      options:['Grief & loss','Loneliness & isolation','Fear of cognitive decline','Family conflict','End-of-life concerns','Financial worry','Chronic pain'] },
+    { question:'Describe the persona\'s voice — signature phrases, mannerisms, or storytelling style.', type:'textarea',
+      placeholder:'e.g., Speaks like a wise elder over tea. Often says "as the old masters teach us…" — never rushes, always ends with encouragement.' },
+    { question:'Domain expertise boundaries — what should the persona never claim to be able to do?', type:'textarea',
+      placeholder:'e.g., Never diagnose. Never recommend stopping prescribed medication. Always refer complex questions to a professional.' },
+    { question:'How proactively should the persona engage?', type:'radio',
+      options:['Proactively suggest tips and check-ins','Wait to be asked — respect autonomy','Gentle suggestions when the senior seems uncertain','Mirror the senior\'s energy and follow their lead'] },
+    { question:'Cultural sensitivities or traditional beliefs to accommodate:', type:'textarea',
+      placeholder:'e.g., Many seniors respect ancestral practices, feng shui, auspicious dates. Acknowledge respectfully without dismissing.' },
+    { question:'When the senior is confused or gives an unclear response, the persona should:', type:'radio',
+      options:['Gently ask for clarification using simpler words','Rephrase its own question more simply','Offer 2–3 concrete options to choose from','Suggest speaking to a care staff member'] },
+    { question:'What should be the persona\'s response style for common daily requests?', type:'checkbox',
+      options:['Step-by-step numbered instructions','Short sentences — max 2–3 per response','Use analogies and relatable examples','Summarise key points at the end','Ask a follow-up question to confirm understanding','Offer to explain further if needed'] }
+  ]);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ROUND 2 — RENDER
+═══════════════════════════════════════════════════════════════════════ */
 function renderRound2() {
   const { charName, role } = state.r1;
-  const display = role === 'custom' ? state.r1.customRole || 'Your Persona' : roleName(role);
-  const rqs   = (roleQuestions[role] || roleQuestions.custom);
-  const allQs = [...rqs, ...universalQuestions];
+  const displayRole = role==='custom' ? state.r1.customRole||'Your Persona' : roleName(role);
+
+  const intentCard = state.intentAnalysis ? `
+    <div class="ai-card rounded-2xl p-5 mb-5 flex items-start gap-3">
+      <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center shrink-0 text-base">🧠</div>
+      <div>
+        <div class="text-xs font-semibold text-indigo-600 mb-1 flex items-center gap-1.5">
+          DeepSeek Intent Analysis
+          <span class="bg-indigo-100 text-indigo-500 text-[9px] px-1.5 py-0.5 rounded-full font-mono">deepseek-chat</span>
+        </div>
+        <p class="text-sm text-gray-700 leading-relaxed">${state.intentAnalysis}</p>
+      </div>
+    </div>` : '';
 
   document.getElementById('round2').innerHTML = `
     <div class="fade-in">
-      <div class="mb-7">
+      <div class="mb-6">
         <div class="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-700 text-xs font-semibold px-3 py-1 rounded-full mb-2">Round 2 of 3</div>
         <h2 class="text-2xl font-bold text-gray-900">Refine <span class="text-indigo-600">${charName}</span></h2>
-        <p class="text-gray-500 text-sm mt-1">A few deeper questions to make your ${display} persona robust, nuanced, and senior-ready.</p>
+        <p class="text-gray-500 text-sm mt-1">DeepSeek analysed your ${displayRole} persona and generated these targeted questions.</p>
       </div>
-
+      ${intentCard}
       <div class="space-y-4" id="r2Questions">
-        ${allQs.map((q,i) => renderQ(q, i, charName)).join('')}
+        ${state.aiQuestions.map((q,i) => renderQ(q,i,charName)).join('')}
       </div>
-
       <div class="flex justify-between mt-8">
-        <button onclick="goBack(1)"
-          class="border border-gray-200 text-gray-600 font-medium px-5 py-2.5 rounded-xl text-sm hover:bg-gray-50 transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-          Back
+        <button onclick="goBack(1)" class="border border-gray-200 text-gray-600 font-medium px-5 py-2.5 rounded-xl text-sm hover:bg-gray-50 transition flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back
         </button>
-        <button onclick="goToRound3()"
-          class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-semibold px-7 py-2.5 rounded-xl text-sm transition shadow-md flex items-center gap-2">
+        <button onclick="goToRound3()" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-semibold px-7 py-2.5 rounded-xl text-sm transition shadow-md flex items-center gap-2">
           Generate Persona
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
         </button>
       </div>
-    </div>
-  `;
+    </div>`;
 
-  /* attach pill-style event listeners for Round 2 */
+  /* Pill/card selection feedback for Round 2 */
   document.getElementById('r2Questions').addEventListener('change', e => {
     const inp = e.target;
-    if (inp.type === 'checkbox' && inp.dataset.r2) {
-      inp.nextElementSibling?.classList.toggle('border-indigo-500', inp.checked);
-      inp.nextElementSibling?.classList.toggle('bg-indigo-50', inp.checked);
-      inp.nextElementSibling?.classList.toggle('text-indigo-700', inp.checked);
+    if (inp.type==='checkbox' && inp.dataset.r2) {
+      const lbl = inp.nextElementSibling;
+      lbl?.classList.toggle('border-indigo-500', inp.checked);
+      lbl?.classList.toggle('bg-indigo-50', inp.checked);
+      lbl?.classList.toggle('text-indigo-700', inp.checked);
     }
-    if (inp.type === 'radio' && inp.dataset.r2) {
-      document.querySelectorAll(`[name="${inp.name}"]`).forEach(r => {
-        r.closest('label')?.classList.remove('border-indigo-500','bg-indigo-50');
-      });
+    if (inp.type==='radio' && inp.dataset.r2) {
+      document.querySelectorAll(`[name="${inp.name}"]`).forEach(r =>
+        r.closest('label')?.classList.remove('border-indigo-500','bg-indigo-50')
+      );
       inp.closest('label')?.classList.add('border-indigo-500','bg-indigo-50');
     }
   });
@@ -825,203 +669,264 @@ function renderRound2() {
 
 function renderQ(q, i, name) {
   const qText = q.q.replace(/\[Name\]/g, name);
-  const wrap  = `<div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-    <p class="text-sm font-medium text-gray-800 mb-3 leading-relaxed">${qText}</p>
-    BODY
+  const rationaleChip = q.rationale
+    ? `<span class="rationale-chip">💡 ${q.rationale}</span>`
+    : '';
+
+  const header = `<div class="flex flex-col gap-1.5 mb-3">
+    <p class="text-sm font-medium text-gray-800 leading-relaxed">${qText}</p>
+    ${rationaleChip}
   </div>`;
 
-  if (q.type === 'checkbox') {
-    return wrap.replace('BODY', `<div class="flex flex-wrap gap-2">
-      ${q.opts.map(o => `
-        <label>
-          <input type="checkbox" name="q${i}" value="${esc(o)}" data-r2="1" class="sr-only pill-input" />
-          <span class="pill-label">${o}</span>
-        </label>`).join('')}
-    </div>`);
+  if (q.type==='checkbox') {
+    return `<div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+      ${header}
+      <div class="flex flex-wrap gap-2">
+        ${(q.opts||[]).map(o=>`<label><input type="checkbox" name="q${i}" value="${esc(o)}" data-r2="1" class="sr-only pill-input" /><span class="pill-label">${o}</span></label>`).join('')}
+      </div></div>`;
   }
-
-  if (q.type === 'radio') {
-    return wrap.replace('BODY', `<div class="flex flex-col gap-2">
-      ${q.opts.map(o => `
-        <label class="card-label cursor-pointer">
-          <input type="radio" name="q${i}" value="${esc(o)}" data-r2="1" class="card-radio mt-0.5" />
-          <span class="text-sm text-gray-700">${o}</span>
-        </label>`).join('')}
-    </div>`);
+  if (q.type==='radio') {
+    return `<div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+      ${header}
+      <div class="flex flex-col gap-2">
+        ${(q.opts||[]).map(o=>`<label class="card-label cursor-pointer"><input type="radio" name="q${i}" value="${esc(o)}" data-r2="1" class="card-radio mt-0.5" /><span class="text-sm text-gray-700">${o}</span></label>`).join('')}
+      </div></div>`;
   }
-
-  if (q.type === 'textarea') {
-    return wrap.replace('BODY', `<textarea rows="3" id="qt${i}" placeholder="${q.ph||''}"
-      class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition resize-none"></textarea>`);
+  if (q.type==='textarea') {
+    return `<div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+      ${header}
+      <textarea rows="3" id="qt${i}" placeholder="${q.ph||''}"
+        class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition resize-none"></textarea>
+    </div>`;
   }
   return '';
 }
 
-function esc(s) { return s.replace(/"/g,'&quot;'); }
+function esc(s) { return String(s).replace(/"/g,'&quot;'); }
 
-/* ─────────────────────────────────────────────────────────────────────
-   COLLECT ROUND 2
-───────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════
+   ROUND 2 — COLLECT
+═══════════════════════════════════════════════════════════════════════ */
 function collectR2() {
-  const rqs   = roleQuestions[state.r1.role] || roleQuestions.custom;
-  const allQs = [...rqs, ...universalQuestions];
   state.r2 = {};
-  allQs.forEach((q, i) => {
-    if (q.type === 'checkbox') {
+  state.aiQuestions.forEach((q,i) => {
+    if (q.type==='checkbox')
       state.r2[`q${i}`] = [...document.querySelectorAll(`[name="q${i}"]:checked`)].map(e=>e.value);
-    } else if (q.type === 'radio') {
+    else if (q.type==='radio')
       state.r2[`q${i}`] = document.querySelector(`[name="q${i}"]:checked`)?.value || '';
-    } else if (q.type === 'textarea') {
+    else if (q.type==='textarea')
       state.r2[`q${i}`] = document.getElementById(`qt${i}`)?.value || '';
-    }
   });
 }
 
-/* ─────────────────────────────────────────────────────────────────────
-   ROUND 2 → ROUND 3
-───────────────────────────────────────────────────────────────────── */
-function goToRound3() {
-  collectR2();
-  renderRound3();
-  switchPanel('round3');
-  activateStep(3);
+function formatR2Answers() {
+  return state.aiQuestions.map((q,i) => {
+    const val = state.r2[`q${i}`];
+    if (!val || (Array.isArray(val) && !val.length)) return null;
+    return `Q: ${q.q}\nA: ${Array.isArray(val) ? val.join(', ') : val}`;
+  }).filter(Boolean).join('\n\n');
 }
 
-/* ─────────────────────────────────────────────────────────────────────
-   GENERATE SYSTEM PROMPT
-───────────────────────────────────────────────────────────────────── */
-function buildPrompt() {
-  const r1 = state.r1, r2 = state.r2;
-  const rqs = roleQuestions[r1.role] || roleQuestions.custom;
-  const allQs = [...rqs, ...universalQuestions];
-  const displayRole = r1.role === 'custom' ? r1.customRole : roleName(r1.role);
+/* ═══════════════════════════════════════════════════════════════════════
+   ROUND 3 — NAVIGATE
+═══════════════════════════════════════════════════════════════════════ */
+async function goToRound3() {
+  collectR2();
+  switchPanel('round3');
+  activateStep(3);
 
-  /* helpers to find universal question answers by content keyword */
-  const uqStart = rqs.length;
-  const findU = (keyword) => {
-    const idx = universalQuestions.findIndex(q => q.q.toLowerCase().includes(keyword));
-    return idx >= 0 ? (r2[`q${uqStart+idx}`] || '') : '';
-  };
-  const greeting    = findU('open each conversation');
-  const voiceDesc   = findU('voice');
-  const cultural    = findU('cultural');
-  const engagestyle = findU('proactive engagement');
-  const sensitiveRaw= findU('sensitive topics');
-  const sensitiveArr= Array.isArray(sensitiveRaw) ? sensitiveRaw : [];
+  document.getElementById('round3').innerHTML = loadingHTML(
+    'Crafting best-practice prompt with DeepSeek AI…',
+    ['Applying prompt engineering patterns…','Optimising for senior care context…','Curating knowledge base recommendations…','Adding searchable keywords…','Finalising your persona…'],
+    'This may take 15–25 seconds'
+  );
 
-  /* OCEAN descriptions */
+  try {
+    setAIStatus('active');
+    const raw  = await callDeepSeek(buildR3Messages(), 5000);
+    const data = extractJSON(raw);
+    state.aiPrompt = data.systemPrompt || '';
+    state.aiKB     = data.knowledgeBase || [];
+    setAIStatus('idle');
+    renderRound3();
+  } catch(err) {
+    console.error('DeepSeek Round 3 error:', err);
+    setAIStatus('error');
+    toast('DeepSeek unavailable — using built-in generator', 'warn');
+    state.aiPrompt = buildFallbackPrompt();
+    state.aiKB     = [];
+    renderRound3();
+  }
+}
+
+/* Build the DeepSeek prompt for Round 3 */
+function buildR3Messages() {
+  const r1 = state.r1;
+  const displayRole = r1.role==='custom' ? r1.customRole : roleName(r1.role);
   const O=r1.ocean.O, C=r1.ocean.C, E=r1.ocean.E, A=r1.ocean.A, N=r1.ocean.N;
-  const oDesc = O>=7 ? 'You are genuinely curious and open to new ideas. You enjoy exploring unconventional angles and creative explanations.'
-              : O<=3 ? 'You prefer proven, familiar methods that seniors trust. Your consistency and reliability are your strengths.'
-              : 'You balance curiosity with grounded, reliable guidance.';
-  const cDesc = C>=7 ? 'You are organised and methodical — you provide structured, step-by-step guidance and ensure nothing important is missed.'
-              : C<=3 ? 'You are flexible and go with the flow, adapting naturally to where the conversation leads.'
-              : 'You offer clear structure when helpful, but remain adaptable to the natural flow of each conversation.';
-  const eDesc = E>=7 ? 'You are warm and expressive — enthusiastic, chatty, and energetic. You bring positive energy to every exchange.'
-              : E<=3 ? 'You are calm and reflective. You listen deeply and speak thoughtfully — seniors feel truly heard.'
-              : 'You balance warmth and expressiveness with calm, attentive listening.';
-  const aDesc = A>=7 ? 'You are deeply empathetic and cooperative. You validate feelings readily and approach every senior with unconditional positive regard.'
-              : A<=3 ? 'You are direct and honest — you give clear, truthful guidance while remaining respectful.'
-              : 'You combine genuine empathy with honest, clear guidance.';
-  const nDesc = N>=7 ? 'You are emotionally attuned and sensitive, picking up on subtle cues and responding with great care.'
-              : N<=3 ? 'You are a steady, unflappable presence — seniors feel grounded and reassured in your consistency.'
-              : 'You remain emotionally steady while staying sensitive to each senior\'s needs.';
 
-  /* Cognitive level phrasing */
-  const cogPhrasing = {
-    standard  : 'Your seniors have full cognitive function. Engage with normal depth and richness of conversation.',
-    mild      : 'Some of your seniors may have mild memory concerns. Be patient, avoid overloading with information, and gently guide them back if they lose track.',
-    intensive : 'Your seniors need significant cognitive support. Keep EVERY response very short (3–5 sentences maximum). Use simple words. Repeat key points gently.'
-  }[r1.cogLevel] || '';
+  const r2Answers = formatR2Answers();
+  const intentSummary = state.intentAnalysis || 'Not available';
 
-  /* Emergency text */
-  const emergencyText = {
-    staff  : 'If a senior mentions a physical emergency (chest pain, difficulty breathing, fall, feeling faint), say immediately:\n"Please press your call button or tell a care staff member right now. Your safety is the most important thing."',
-    hotline: 'If a senior mentions an emergency, provide:\n- Emergency: 995\n- Senior Helpline: 1800-202-6868',
-    both   : 'If a senior mentions any emergency:\n1. Say: "Please press your call button or speak to a care staff member immediately."\n2. Provide: Emergency — 995 | Senior Helpline — 1800-202-6868'
-  }[r1.emergency] || '';
+  const fullConfig = `
+PERSONA: ${r1.charName} — ${displayRole} (${r1.expertise})
+DESCRIPTION: ${r1.shortDesc}
+UNIQUE QUALITY: ${r1.uniqueness || 'Not specified'}
+AUDIENCE: ${r1.audience}${r1.audience==='Senior'?` — cognitive support: ${r1.cogLevel}`:''}
+TONE: ${r1.tone}
+LANGUAGES: ${r1.languages.join(', ')}
+GOALS: ${r1.primaryGoals}
+HARD LIMITS: ${r1.hardLimits || 'None specified'}
+EMERGENCY: ${r1.emergency}
+OCEAN: O=${O}/10, C=${C}/10, E=${E}/10, A=${A}/10, N(Stability)=${N}/10
+LLM MODEL: ${r1.llmModel}
 
-  /* Role-specific answers */
-  const roleAnswers = rqs.map((q,i) => {
-    const val = r2[`q${i}`];
-    if (!val || (Array.isArray(val) && !val.length)) return null;
-    return `- ${q.q}: ${Array.isArray(val) ? val.join(', ') : val}`;
-  }).filter(Boolean).join('\n');
+DEEPSEEK INTENT ANALYSIS: ${intentSummary}
 
-  return `***ROLE AND PERSONA***
-You are **${r1.charName.toUpperCase()}**, a ${r1.expertise.toLowerCase()} with deep expertise as a ${displayRole}.
+FOLLOW-UP ANSWERS:
+${r2Answers || 'No follow-up answers provided.'}
+`.trim();
 
-${r1.uniqueness ? r1.uniqueness + '\n' : ''}${voiceDesc ? voiceDesc + '\n' : ''}
-***WHO YOU SERVE***
-You are speaking with **${r1.audience.toLowerCase()} residents** at a senior care facility. Primary language(s): ${r1.languages.join(', ')}.
+  return [
+    {
+      role: 'system',
+      content: `You are a world-class AI prompt engineer and knowledge architect specialising in elder care conversational AI in Singapore. You craft precise, production-ready system prompts and design targeted knowledge bases. Your prompts are warm, specific, safe, and deeply tailored to each persona's role and senior care context.`
+    },
+    {
+      role: 'user',
+      content: `Based on this complete persona configuration, generate:
+1. A best-practice, production-ready system prompt
+2. Knowledge base recommendations with searchable keywords
 
-${cogPhrasing}
+COMPLETE CONFIGURATION:
+${fullConfig}
 
-${cultural ? '***CULTURAL AWARENESS***\n' + cultural + '\n' : ''}
-***YOUR MISSION***
+─── SYSTEM PROMPT REQUIREMENTS ───
+- Length: 450–650 words
+- Use section markers: ***SECTION NAME*** (uppercase, bold-style)
+- Sections to include: ROLE & PERSONA, MISSION, WHO YOU SERVE, PERSONALITY, COMMUNICATION STYLE, OPENING CONVERSATIONS, DOMAIN EXPERTISE, SENSITIVE TOPICS, EMERGENCY PROTOCOL, BOUNDARIES & LIMITATIONS, QUALITY CHECKLIST
+- Be highly specific to this persona — use their name, reference their role and goals
+- Incorporate insights from the follow-up answers naturally
+- Translate OCEAN scores into concrete behavioural instructions (e.g., O=9 → "actively explore creative analogies")
+- Include 1 example opening line in character
+- Safety and referral protocols must be unambiguous
+- Match the tone (${r1.tone}) throughout
+
+─── KNOWLEDGE BASE REQUIREMENTS ───
+- Suggest 8–10 specific document types
+- Mix: clinical guidelines, practice manuals, cultural guides, safety protocols, FAQ docs
+- Include both role-specific AND universal elder care documents
+- For each document, provide 5–7 HIGHLY SPECIFIC searchable keywords optimised for:
+  * Academic databases (PubMed, Google Scholar)
+  * Singapore government portals (MOH, HPB, IMDA)
+  * Library searches
+  * General web searches
+- Keywords should be phrases (2–4 words), not single words
+- Label priority: "high" (upload first), "medium", "low"
+
+Return ONLY valid JSON (no markdown fences, no explanation):
+{
+  "systemPrompt": "complete prompt here with ***SECTION*** markers",
+  "knowledgeBase": [
+    {
+      "title": "specific document title",
+      "description": "1–2 sentences on what it covers and why it's needed for this persona",
+      "keywords": ["keyword phrase 1", "keyword phrase 2", ...],
+      "priority": "high" | "medium" | "low",
+      "type": "Clinical Guideline" | "Practice Manual" | "Reference Guide" | "Research Summary" | "FAQ" | "Protocol" | "Cultural Guide" | "Regulatory Document"
+    }
+  ]
+}`
+    }
+  ];
+}
+
+/* Fallback prompt if API fails */
+function buildFallbackPrompt() {
+  const r1 = state.r1;
+  const displayRole = r1.role==='custom' ? r1.customRole : roleName(r1.role);
+  const emergencyText = { staff:'Direct to staff immediately.', hotline:'Provide 995 / 1800-202-6868.', both:'Direct to staff AND provide 995 / 1800-202-6868.' }[r1.emergency]||'';
+  return `***ROLE & PERSONA***
+You are ${r1.charName}, a ${r1.expertise.toLowerCase()} with deep expertise as a ${displayRole}.
+${r1.uniqueness ? r1.uniqueness : ''}
+
+***MISSION***
 ${r1.primaryGoals}
 
-***PERSONALITY (OCEAN)***
-- Openness (${O}/10): ${oDesc}
-- Conscientiousness (${C}/10): ${cDesc}
-- Extraversion (${E}/10): ${eDesc}
-- Agreeableness (${A}/10): ${aDesc}
-- Emotional Stability (${N}/10): ${nDesc}
+***WHO YOU SERVE***
+You serve ${r1.audience.toLowerCase()} users. Primary languages: ${r1.languages.join(', ')}.
 
-***TONE & COMMUNICATION***
-Overall tone: ${r1.tone} — ${{'Empathetic':'warm, validating, emotionally attuned','Professional':'knowledgeable, clear, trustworthy','Friendly':'approachable, conversational, relaxed','Motivational':'uplifting, encouraging, action-oriented'}[r1.tone]||r1.tone}
+***PERSONALITY***
+Openness ${r1.ocean.O}/10 · Conscientiousness ${r1.ocean.C}/10 · Extraversion ${r1.ocean.E}/10 · Agreeableness ${r1.ocean.A}/10 · Emotional Stability ${r1.ocean.N}/10
 
-- Use simple, everyday language. Avoid jargon.
-- Speak at a measured, unhurried pace.
-- Regularly check that the senior understands.
-- If the senior speaks in Mandarin, dialect, or another preferred language, respond in that language where possible.
-${engagestyle ? '- Engagement: ' + engagestyle : ''}
-
-***STARTING A CONVERSATION***
-${greeting || 'Begin with a warm, friendly greeting. Ask how the senior is feeling before getting into the topic.'}
-
-Example opening: "Hello! So lovely to chat with you today. How are you feeling? Is there something I can help you with, or shall we just have a friendly chat?"
-
-***DOMAIN KNOWLEDGE***
-${roleAnswers || `As a ${displayRole}, you have deep knowledge relevant to seniors' health, wellbeing, and quality of life in this area.`}
-
-***SENSITIVE TOPICS***
-${sensitiveArr.length ? `You may encounter conversations about: ${sensitiveArr.join(', ')}.\n\nApproach these with deep empathy. Listen first. Validate feelings. Never dismiss or minimise their emotions. Do not offer unsolicited advice — ask if they would like your thoughts before sharing.`
-: 'Approach all sensitive topics with deep empathy. Listen first, validate feelings, and respond with patience and care.'}
+***COMMUNICATION STYLE***
+Tone: ${r1.tone}. Use simple language. Be patient and respectful.
 
 ***EMERGENCY PROTOCOL***
 ${emergencyText}
 
 ***BOUNDARIES & LIMITATIONS***
-${r1.hardLimits || 'Never provide advice that should come from a licensed medical, legal, or financial professional. Always refer seniors to qualified staff or professionals for complex matters.'}
-
-- You are an AI assistant, not a substitute for medical, psychological, or professional care.
-- When in doubt, encourage the senior to speak with a care staff member.
-- Prioritise the senior's safety and dignity above all else.
-
-***QUALITY CHECKLIST***
-Before every response, ask yourself:
-✓ Is this response safe, accurate, and age-appropriate?
-✓ Have I used language simple enough for this senior?
-✓ Am I being warm, patient, and respectful?
-✓ Should this be referred to a care professional?`.trim();
+${r1.hardLimits || 'Never substitute for licensed professional advice. Refer complex matters to qualified staff.'}`;
 }
 
-/* ─────────────────────────────────────────────────────────────────────
-   RENDER ROUND 3
-───────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════
+   ROUND 3 — RENDER
+═══════════════════════════════════════════════════════════════════════ */
 function renderRound3() {
-  const r1      = state.r1;
-  const prompt  = buildPrompt();
-  const kbItems = [...(kbRole[r1.role] || kbRole.custom), ...kbUniversal];
-  const displayRole = r1.role === 'custom' ? r1.customRole : roleName(r1.role);
+  const r1 = state.r1;
+  const displayRole = r1.role==='custom' ? r1.customRole : roleName(r1.role);
+  const prompt  = state.aiPrompt;
+  const kbItems = state.aiKB;
+
+  const kbHTML = kbItems.length
+    ? kbItems.map((doc,i) => {
+        const badgeClass = { high:'badge-high', medium:'badge-medium', low:'badge-low' }[doc.priority||'medium'] || 'badge-medium';
+        const typeLabel = doc.type || 'Document';
+        const kwTags = (doc.keywords||[]).map(kw =>
+          `<span class="kw-tag" title="Click to copy" onclick="copyStr('${esc(kw)}','Keyword copied!')">#${kw}</span>`
+        ).join('');
+        return `
+        <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+          <div class="w-9 h-9 bg-red-100 text-red-600 font-bold text-[10px] rounded-lg flex items-center justify-center shrink-0">PDF</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start flex-wrap gap-2 mb-1">
+              <span class="text-sm font-medium text-gray-900 flex-1">${doc.title}</span>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border ${badgeClass}">${(doc.priority||'medium').toUpperCase()}</span>
+                <span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">${typeLabel}</span>
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 mb-2">${doc.description}</p>
+            <div class="flex flex-wrap gap-1">${kwTags}</div>
+            <div class="mt-1.5">
+              <button onclick="copyStr('${esc((doc.keywords||[]).join(', '))}','All keywords copied!')"
+                class="text-[10px] text-indigo-500 hover:text-indigo-700 transition flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                Copy all keywords
+              </button>
+            </div>
+          </div>
+        </div>`;
+      }).join('')
+    : `<div class="text-sm text-gray-400 text-center py-8">No AI-generated knowledge base — DeepSeek was unavailable. Please regenerate to try again.</div>`;
+
+  const configRows = [
+    ['Character Name', r1.charName],
+    ['Role', displayRole],
+    ['Expertise', r1.expertise],
+    ['Target Audience', r1.audience],
+    ['Tone', r1.tone],
+    ['Language', r1.languages.join(', ')],
+    ['LLM Model', r1.llmModel],
+    ['Usage Policy', 'Prioritize Knowledge Base']
+  ];
 
   document.getElementById('round3').innerHTML = `
     <div class="fade-in">
       <div class="mb-7">
         <div class="inline-flex items-center gap-1.5 bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full mb-2">Round 3 of 3</div>
         <h2 class="text-2xl font-bold text-gray-900">✨ Your Persona is Ready</h2>
-        <p class="text-gray-500 text-sm mt-1">Review, refine, and copy everything into your agent config.</p>
+        <p class="text-gray-500 text-sm mt-1">DeepSeek generated your system prompt and knowledge base. Review, refine, and copy into your agent config.</p>
       </div>
 
       <!-- Summary Banner -->
@@ -1032,9 +937,15 @@ function renderRound3() {
           <div class="text-indigo-200 text-sm mt-0.5">${displayRole} · ${r1.expertise}</div>
           <div class="flex flex-wrap gap-1.5 mt-2">
             <span class="bg-white/20 text-xs px-2 py-0.5 rounded-full">${r1.audience}</span>
-            <span class="bg-white/20 text-xs px-2 py-0.5 rounded-full">${r1.tone} tone</span>
+            <span class="bg-white/20 text-xs px-2 py-0.5 rounded-full">${r1.tone}</span>
             <span class="bg-white/20 text-xs px-2 py-0.5 rounded-full">${r1.languages.join(', ')}</span>
-            <span class="bg-white/20 text-xs px-2 py-0.5 rounded-full">${r1.llmModel}</span>
+            <span class="bg-white/20 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">🤖 ${r1.llmModel}</span>
+          </div>
+        </div>
+        <div class="shrink-0 flex flex-col items-end gap-1.5">
+          <div class="bg-white/20 text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5">
+            <div class="w-1.5 h-1.5 bg-emerald-300 rounded-full"></div>
+            DeepSeek generated
           </div>
         </div>
       </div>
@@ -1050,52 +961,45 @@ function renderRound3() {
 
         <!-- PROMPT TAB -->
         <div id="tab-prompt" class="p-5">
-          <div class="flex items-center justify-between mb-3">
-            <p class="text-xs text-gray-500">Review and edit the generated system prompt, then copy it into the agent config.</p>
+          <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <p class="text-xs text-gray-500">AI-generated by DeepSeek · editable below</p>
+              <span class="bg-emerald-50 text-emerald-600 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-emerald-100">Best Practice</span>
+            </div>
             <button onclick="copyText('promptTA','Prompt copied!')"
               class="flex items-center gap-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-              Copy
+              Copy Prompt
             </button>
           </div>
-          <textarea id="promptTA" rows="26"
-            class="w-full border border-gray-100 rounded-xl px-4 py-3 prompt-area focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none bg-gray-50"
-          >${prompt}</textarea>
+          <textarea id="promptTA" rows="28"
+            class="w-full border border-gray-100 rounded-xl px-4 py-3 prompt-area focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none bg-gray-50">${prompt}</textarea>
           <div class="mt-3 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-xs text-amber-700">
-            💡 <strong>Tip:</strong> You can edit this prompt directly above before copying. Paste it into the <strong>System Prompt</strong> field in your agent config.
+            💡 <strong>Tip:</strong> Edit the prompt directly above before copying. Paste into the <strong>System Prompt</strong> field in your agent configuration panel.
           </div>
         </div>
 
         <!-- KB TAB -->
         <div id="tab-kb" class="p-5 hidden">
-          <p class="text-xs text-gray-500 mb-4">Upload these documents to ${r1.charName}'s knowledge base. Priority order: role-specific first, then universal.</p>
-          <div class="space-y-3">
-            ${kbItems.map((doc, i) => {
-              const isRole = i < (kbRole[r1.role]||kbRole.custom).length;
-              return `
-              <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-9 h-9 bg-red-100 text-red-600 font-bold text-[10px] rounded-lg flex items-center justify-center shrink-0">PDF</div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-start justify-between gap-2 flex-wrap">
-                    <span class="text-sm font-medium text-gray-900">${doc.title}</span>
-                    <span class="text-[11px] text-gray-400 shrink-0">${doc.pages}</span>
-                  </div>
-                  <p class="text-xs text-gray-500 mt-0.5">${doc.desc}</p>
-                </div>
-                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${isRole?'badge-role':'badge-universal'}">${isRole?'Role-specific':'Universal'}</span>
-              </div>`;
-            }).join('')}
+          <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <p class="text-xs text-gray-500">Upload these documents to ${r1.charName}'s knowledge base. Click any <span class="kw-tag">keyword</span> to copy it for searching.</p>
+            <div class="flex items-center gap-1.5 text-[10px] text-gray-400">
+              <span class="badge-high text-[10px] px-2 py-0.5 rounded-full border font-semibold">HIGH</span> upload first
+              <span class="badge-medium text-[10px] px-2 py-0.5 rounded-full border font-semibold">MED</span> then
+              <span class="badge-low text-[10px] px-2 py-0.5 rounded-full border font-semibold">LOW</span>
+            </div>
           </div>
+          <div class="space-y-3">${kbHTML}</div>
           <div class="mt-4 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-xs text-blue-700">
-            📌 <strong>Upload order:</strong> Start with role-specific PDFs, then add universal ones. You can also add your facility's own SOPs, intake forms, and activity guides.
+            📌 <strong>How to use keywords:</strong> Click a keyword tag to copy it, then search in Google Scholar, PubMed, MOH Singapore, or your facility's document library to find the relevant PDF. Prioritise HIGH documents first.
           </div>
         </div>
 
         <!-- OCEAN TAB -->
         <div id="tab-ocean" class="p-5 hidden">
           <p class="text-xs text-gray-500 mb-4">Copy these values into the <strong>OCEAN Personality Traits</strong> tab in your agent config.</p>
-          <div class="grid grid-cols-1 sm:grid-cols-5 gap-3">
-            ${oceanDefs.map(d => `
+          <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 mb-4">
+            ${oceanDefs.map(d=>`
             <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 text-center">
               <div class="text-2xl mb-1">${d.emoji}</div>
               <div class="text-xs font-semibold text-gray-700 mb-2">${d.label}</div>
@@ -1107,13 +1011,13 @@ function renderRound3() {
               <div class="text-[10px] text-gray-500 mt-1.5">${r1.ocean[d.key]<=3?d.lo:r1.ocean[d.key]>=7?d.hi:'Balanced'}</div>
             </div>`).join('')}
           </div>
-          <div class="mt-4 grid grid-cols-1 gap-3">
-            ${oceanDefs.map(d => {
-              const v = r1.ocean[d.key];
-              const desc = v>=7?`(${v}/10) ${d.hiDesc}`:v<=3?`(${v}/10) ${d.loDesc}`:`(${v}/10) Balanced between ${d.lo} and ${d.hi}`;
+          <div class="grid grid-cols-1 gap-2">
+            ${oceanDefs.map(d=>{
+              const v=r1.ocean[d.key];
+              const desc=v>=7?`${d.hiDesc}`:v<=3?`${d.loDesc}`:`Balanced — between ${d.lo} and ${d.hi}`;
               return `<div class="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 text-sm">
-                <span class="text-lg shrink-0">${d.emoji}</span>
-                <span class="font-medium text-gray-700 w-36 shrink-0">${d.label}</span>
+                <span class="text-base shrink-0">${d.emoji}</span>
+                <span class="font-medium text-gray-700 w-36 shrink-0">${d.label} — ${v}/10</span>
                 <span class="text-gray-500 text-xs">${desc}</span>
               </div>`;
             }).join('')}
@@ -1123,181 +1027,207 @@ function renderRound3() {
         <!-- FIELDS TAB -->
         <div id="tab-fields" class="p-5 hidden">
           <p class="text-xs text-gray-500 mb-4">Copy these values into the corresponding fields in your agent <strong>Configuration</strong> tab.</p>
-          <div class="space-y-3">
-            ${[
-              ['Character Name', r1.charName],
-              ['Role',           displayRole],
-              ['Expertise',      r1.expertise],
-              ['Target Audience',r1.audience],
-              ['Tone',           r1.tone],
-              ['Language',       r1.languages.join(', ')],
-              ['LLM Model',      r1.llmModel],
-              ['Knowledge Base', (kbRole[r1.role]||kbRole.custom).map(k=>k.title.split('(')[0].trim()).join('; ')],
-              ['Usage Policy',   'Prioritize Knowledge Base']
-            ].map(([label,val]) => `
-              <div class="flex items-start gap-3 border border-gray-100 rounded-xl px-4 py-3 bg-gray-50">
-                <span class="text-xs font-semibold text-gray-500 w-32 shrink-0 pt-0.5">${label}</span>
-                <span class="text-sm text-gray-800 flex-1">${val}</span>
-                <button onclick="copyStr('${val.replace(/'/g,"\\'")}','Copied!')"
-                  class="text-gray-400 hover:text-indigo-600 transition shrink-0">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                </button>
-              </div>`).join('')}
+          <div class="space-y-2">
+            ${configRows.map(([label,val])=>`
+            <div class="flex items-center gap-3 border border-gray-100 rounded-xl px-4 py-3 bg-gray-50">
+              <span class="text-xs font-semibold text-gray-500 w-32 shrink-0">${label}</span>
+              <span class="text-sm text-gray-800 flex-1">${val}</span>
+              <button onclick="copyStr('${esc(val)}','Copied!')" class="text-gray-400 hover:text-indigo-600 transition shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              </button>
+            </div>`).join('')}
           </div>
         </div>
 
-      </div><!-- /tabs wrapper -->
+      </div><!-- /tabs -->
 
       <div class="flex items-center justify-between">
         <div class="flex gap-2">
-          <button onclick="goBack(2)"
-            class="border border-gray-200 text-gray-600 font-medium px-5 py-2.5 rounded-xl text-sm hover:bg-gray-50 transition flex items-center gap-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            Back
+          <button onclick="goBack(2)" class="border border-gray-200 text-gray-600 font-medium px-5 py-2.5 rounded-xl text-sm hover:bg-gray-50 transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back
           </button>
-          <button onclick="startOver()"
-            class="border border-gray-200 text-gray-500 font-medium px-5 py-2.5 rounded-xl text-sm hover:bg-gray-50 transition">
-            Start Over
-          </button>
+          <button onclick="startOver()" class="border border-gray-200 text-gray-500 font-medium px-5 py-2.5 rounded-xl text-sm hover:bg-gray-50 transition">Start Over</button>
         </div>
-        <button onclick="exportAll()"
-          class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold px-7 py-2.5 rounded-xl text-sm transition shadow-md flex items-center gap-2">
+        <button onclick="exportAll()" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold px-7 py-2.5 rounded-xl text-sm transition shadow-md flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           Export Config
         </button>
       </div>
+    </div>`;
+}
 
+/* ═══════════════════════════════════════════════════════════════════════
+   LOADING HTML HELPER
+═══════════════════════════════════════════════════════════════════════ */
+function loadingHTML(mainMsg, cycleMessages, subMsg) {
+  const msgsJSON = JSON.stringify(cycleMessages);
+  return `
+    <div class="fade-in min-h-[65vh] flex flex-col items-center justify-center gap-5 px-4">
+      <!-- Spinner ring -->
+      <div class="relative w-16 h-16">
+        <div class="absolute inset-0 rounded-full border-4 border-indigo-100"></div>
+        <div class="absolute inset-0 rounded-full border-4 border-indigo-600 border-t-transparent spinner"></div>
+      </div>
+
+      <!-- DeepSeek badge -->
+      <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm">
+        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+        <span class="text-xs font-semibold text-gray-600">DeepSeek AI</span>
+        <span class="text-[10px] text-gray-400 font-mono">deepseek-chat</span>
+      </div>
+
+      <!-- Cycling message -->
+      <div class="text-center">
+        <div id="loadingMain" class="text-sm font-semibold text-gray-800 mb-1">${mainMsg}</div>
+        <div id="loadingSub" class="text-xs text-gray-400">${subMsg}</div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="w-52 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+        <div id="loadingBar" class="h-1.5 bg-indigo-500 rounded-full w-1/5 transition-all duration-700"></div>
+      </div>
     </div>
-  `;
+    <script>
+    (function(){
+      const msgs = ${msgsJSON};
+      let i = 0, pct = 20;
+      const mainEl = document.getElementById('loadingMain');
+      const barEl  = document.getElementById('loadingBar');
+      if (!mainEl) return;
+      const iv = setInterval(()=>{
+        i = (i+1) % msgs.length;
+        pct = Math.min(90, pct + Math.floor(Math.random()*15+8));
+        if (mainEl) mainEl.textContent = msgs[i];
+        if (barEl)  barEl.style.width  = pct + '%';
+        if (!document.getElementById('loadingMain')) clearInterval(iv);
+      }, 2200);
+    })();
+    <\/script>`;
 }
 
-/* ─────────────────────────────────────────────────────────────────────
-   TAB SWITCHING
-───────────────────────────────────────────────────────────────────── */
-function switchTab(name, btn) {
-  document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
-  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById(`tab-${name}`).classList.remove('hidden');
-  btn.classList.add('active');
-}
-
-/* ─────────────────────────────────────────────────────────────────────
-   NAV HELPERS
-───────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════
+   UI HELPERS
+═══════════════════════════════════════════════════════════════════════ */
 function switchPanel(id) {
   ['round1','round2','round3'].forEach(r => document.getElementById(r).classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function goBack(toRound) {
-  switchPanel(`round${toRound}`);
-  document.getElementById(`round${toRound}`).classList.add('fade-in');
-  // Deactivate later steps
-  if (toRound < 3) {
-    const c3 = document.getElementById('s3-circle');
-    c3.className = 'w-7 h-7 rounded-full bg-gray-200 text-gray-500 text-xs font-bold flex items-center justify-center shrink-0 transition-all';
-    document.getElementById('s3-label').className = 'text-xs text-gray-400 hidden sm:block whitespace-nowrap';
-    document.getElementById('line-23').classList.remove('done');
-  }
-  if (toRound < 2) {
-    const c2 = document.getElementById('s2-circle');
-    c2.className = 'w-7 h-7 rounded-full bg-gray-200 text-gray-500 text-xs font-bold flex items-center justify-center shrink-0 transition-all';
-    document.getElementById('s2-label').className = 'text-xs text-gray-400 hidden sm:block whitespace-nowrap';
-    document.getElementById('line-12').classList.remove('done');
-  }
+  window.scrollTo({ top:0, behavior:'smooth' });
 }
 
 function activateStep(n) {
-  if (n >= 2) {
-    document.getElementById('s2-circle').className = 'w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center shrink-0 transition-all';
-    document.getElementById('s2-label').className  = 'text-xs font-medium text-indigo-700 hidden sm:block whitespace-nowrap';
+  if (n>=2) {
+    const c=document.getElementById('s2-circle');
+    c.className='w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center shrink-0 transition-all';
+    document.getElementById('s2-label').className='text-xs font-medium text-indigo-700 hidden sm:block whitespace-nowrap';
     document.getElementById('line-12').classList.add('done');
   }
-  if (n >= 3) {
-    document.getElementById('s3-circle').className = 'w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center shrink-0 transition-all';
-    document.getElementById('s3-label').className  = 'text-xs font-medium text-indigo-700 hidden sm:block whitespace-nowrap';
+  if (n>=3) {
+    const c=document.getElementById('s3-circle');
+    c.className='w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center shrink-0 transition-all';
+    document.getElementById('s3-label').className='text-xs font-medium text-indigo-700 hidden sm:block whitespace-nowrap';
     document.getElementById('line-23').classList.add('done');
   }
 }
 
-/* ─────────────────────────────────────────────────────────────────────
-   COPY / EXPORT / START OVER
-───────────────────────────────────────────────────────────────────── */
+function goBack(toRound) {
+  if (toRound<=1) {
+    state.aiQuestions=[]; state.intentAnalysis='';
+    const c=document.getElementById('s2-circle');
+    c.className='w-7 h-7 rounded-full bg-gray-200 text-gray-500 text-xs font-bold flex items-center justify-center shrink-0 transition-all';
+    document.getElementById('s2-label').className='text-xs text-gray-400 hidden sm:block whitespace-nowrap';
+    document.getElementById('line-12').classList.remove('done');
+  }
+  if (toRound<=2) {
+    state.aiPrompt=''; state.aiKB=[];
+    const c=document.getElementById('s3-circle');
+    c.className='w-7 h-7 rounded-full bg-gray-200 text-gray-500 text-xs font-bold flex items-center justify-center shrink-0 transition-all';
+    document.getElementById('s3-label').className='text-xs text-gray-400 hidden sm:block whitespace-nowrap';
+    document.getElementById('line-23').classList.remove('done');
+  }
+  switchPanel(`round${toRound}`);
+  document.getElementById(`round${toRound}`).classList.add('fade-in');
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('[id^="tab-"]').forEach(el=>el.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.remove('hidden');
+  btn.classList.add('active');
+}
+
 function copyText(id, msg) {
   const el = document.getElementById(id);
-  navigator.clipboard.writeText(el.value || el.textContent).then(() => toast(msg, 'success'));
+  navigator.clipboard.writeText(el.value||el.textContent).then(()=>toast(msg,'success'));
 }
+
 function copyStr(str, msg) {
-  navigator.clipboard.writeText(str).then(() => toast(msg, 'success'));
+  navigator.clipboard.writeText(str).then(()=>toast(msg,'success'));
 }
 
 function exportAll() {
-  const r1    = state.r1;
-  const prompt= document.getElementById('promptTA')?.value || buildPrompt();
-  const kbItems= [...(kbRole[r1.role]||kbRole.custom), ...kbUniversal];
-  const displayRole = r1.role === 'custom' ? r1.customRole : roleName(r1.role);
-
-  const kbText = kbItems.map((d,i)=>`${i+1}. ${d.title} (${d.pages})\n   ${d.desc}`).join('\n\n');
+  const r1 = state.r1;
+  const displayRole = r1.role==='custom' ? r1.customRole : roleName(r1.role);
+  const prompt  = document.getElementById('promptTA')?.value || state.aiPrompt || buildFallbackPrompt();
+  const kbText  = state.aiKB.length
+    ? state.aiKB.map((d,i)=>`${i+1}. [${(d.priority||'').toUpperCase()}] ${d.title} (${d.type||'Document'})\n   ${d.description}\n   Search keywords: ${(d.keywords||[]).join(' | ')}`).join('\n\n')
+    : '(No AI knowledge base available — regenerate to get DeepSeek recommendations)';
   const oceanText = oceanDefs.map(d=>`${d.label}: ${r1.ocean[d.key]}/10`).join('\n');
-  const fieldsText = [
-    `Character Name: ${r1.charName}`,`Role: ${displayRole}`,`Expertise: ${r1.expertise}`,
-    `Target Audience: ${r1.audience}`,`Tone: ${r1.tone}`,`Language: ${r1.languages.join(', ')}`,
-    `LLM Model: ${r1.llmModel}`,`Usage Policy: Prioritize Knowledge Base`
-  ].join('\n');
 
   const out = `AGENTIC PERSONA CONFIGURATION
-Generated: ${new Date().toLocaleDateString('en-SG',{dateStyle:'long'})}
-${'='.repeat(50)}
+Generated: ${new Date().toLocaleDateString('en-SG',{dateStyle:'long'})} — Powered by DeepSeek AI
+${'='.repeat(60)}
 
 AGENT CONFIG FIELDS
-${'─'.repeat(50)}
-${fieldsText}
+${'─'.repeat(60)}
+Character Name:  ${r1.charName}
+Role:            ${displayRole}
+Expertise:       ${r1.expertise}
+Target Audience: ${r1.audience}
+Tone:            ${r1.tone}
+Language:        ${r1.languages.join(', ')}
+LLM Model:       ${r1.llmModel}
+Usage Policy:    Prioritize Knowledge Base
 
 OCEAN PERSONALITY TRAITS
-${'─'.repeat(50)}
+${'─'.repeat(60)}
 ${oceanText}
 
-SYSTEM PROMPT
-${'─'.repeat(50)}
+SYSTEM PROMPT (DeepSeek Generated)
+${'─'.repeat(60)}
 ${prompt}
 
-RECOMMENDED KNOWLEDGE BASE
-${'─'.repeat(50)}
+KNOWLEDGE BASE RECOMMENDATIONS (DeepSeek Generated)
+${'─'.repeat(60)}
 ${kbText}
 
-${'='.repeat(50)}
-Generated by Persona Builder
+${'='.repeat(60)}
+Generated by Persona Builder · Powered by DeepSeek AI
 `;
 
-  const blob = new Blob([out], { type:'text/plain' });
+  const blob = new Blob([out],{type:'text/plain'});
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  a.href     = url;
-  a.download = `${r1.charName.replace(/\s+/g,'_')}_PersonaConfig.txt`;
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('Config exported!', 'success');
+  a.href=url; a.download=`${r1.charName.replace(/\s+/g,'_')}_PersonaConfig.txt`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('Config exported!','success');
 }
 
 function startOver() {
   if (confirm('Clear all progress and start over?')) location.reload();
 }
 
-/* ─────────────────────────────────────────────────────────────────────
-   TOAST
-───────────────────────────────────────────────────────────────────── */
 function toast(msg, type='error') {
   const el = document.createElement('div');
-  el.className = `px-5 py-3 rounded-xl shadow-lg text-sm font-medium text-white pointer-events-auto mb-2 ${type==='success'?'bg-emerald-500':'bg-red-500'}`;
+  const bg = type==='success'?'bg-emerald-500':type==='warn'?'bg-amber-500':'bg-red-500';
+  el.className = `${bg} text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium pointer-events-auto`;
   el.textContent = msg;
   document.getElementById('toast').appendChild(el);
-  setTimeout(()=>el.remove(), 2800);
+  setTimeout(()=>el.remove(), 3000);
 }
 
-/* ─────────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════════════
    INIT
-───────────────────────────────────────────────────────────────────── */
+═══════════════════════════════════════════════════════════════════════ */
 initOcean();
 </script>
 </body>
