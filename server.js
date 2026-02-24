@@ -67,6 +67,13 @@ const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
 
+  /* ── /api/ping  →  health check ────────────────────────────────── */
+  if (pathname === '/api/ping' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: true, key: !!DEEPSEEK_KEY }));
+    return;
+  }
+
   /* ── /api/deepseek  →  proxy to api.deepseek.com ───────────────── */
   if (pathname === '/api/deepseek' && req.method === 'POST') {
     let body = '';
